@@ -1,14 +1,8 @@
 #include "GameObject.h"
 
-
-GameObject::GameObject(std::string name, Point size, std::string texture, Point position, int z)
-: _name(name), _size(size), _texture(texture), _position(position), _z(z)
+GameObject::GameObject(std::string name, std::string texture, int z)
+: _name(name), _texture(texture), _z(z)
 {
-}
-
-GameObject::GameObject()
-{
-  throw;
 }
 
 GameObject::~GameObject()

@@ -1,5 +1,4 @@
 #include <windows.h>  
-#include "glut.h"
 #include "Graphics.h"
 #include "Game.h"
 

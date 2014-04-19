@@ -5,7 +5,9 @@
 
 static float DELAY = 1.f / FPS;
 
-static GLfloat vertices[][3] =
+#define DEFAULT_VBO "quad"
+
+static GLfloat vertices[4][3] =
 {
   {-1.f, -1.f, 0},
   { 1.f, -1.f, 0},
@@ -13,7 +15,7 @@ static GLfloat vertices[][3] =
   {-1.f,  1.f, 0}
 };
 
-static GLfloat uvs[][2] =
+static GLfloat uvs[4][2] =
 {
   {0.f, 0.f},
   {1.f, 0.f},
@@ -21,13 +23,9 @@ static GLfloat uvs[][2] =
   {0.f, 1.f}
 };
 
-GLubyte indices[] =
-{
-  0, 3, 1, 3, 2, 1
-};
-
 void Graphics::initGL()
 {
+  glewInit();
   glViewport(0, 0, _size.I_X(), _size.I_Y());
 
   GLfloat ratio = _size.X() / _size.Y();
@@ -48,10 +46,53 @@ void Graphics::initGL()
   glFrontFace(GL_CW);
   glShadeModel(GL_SMOOTH);
 }
-void Graphics::loadTextures()
+void Graphics::loadObjectData()
 {
-  for(auto obj : _game->Objects())
-    LoadTexture(obj.second.GetTexture());
+  for(auto objPair : _game->Objects())
+  {
+    GameObject &obj = objPair.second;
+    LoadTexture(obj.GetTexture());
+
+    if(!obj.GetVertexArray().empty())
+      LoadVertex(obj.GetName(), obj.GetVertexArray());
+  }
+}
+
+void Graphics::LoadVertex(std::string name, std::vector<Point> &vVec)
+{
+  std::vector<float> vertexVecFlat, uvVecFlat;
+
+  for(Point p : vVec)
+  {
+    vertexVecFlat.push_back(p.X());
+    vertexVecFlat.push_back(p.Y());
+    vertexVecFlat.push_back(0.f);
+
+    uvVecFlat.push_back((p.X() + 1) / 2);
+    uvVecFlat.push_back((p.Y() + 1) / 2);
+  }
+  loadVertex(vertexVecFlat.data(), vertexVecFlat.size(), uvVecFlat.data(), uvVecFlat.size(), name);
+}
+
+void Graphics::loadVertex(GLvoid *vvp, unsigned int vvSize, GLvoid *uvp, unsigned int uvSize, std::string name)
+{
+  if(_vboMap.count(name) > 0)
+  {
+    Log::Print("VBO " + name + " already exists with ids=" + Utils::ToString(_vboMap[name]._t) + "," + Utils::ToString(_vboMap[name]._v));
+    return;
+  }
+
+  GLuint bufN[2];
+  glGenBuffers(2, bufN);
+  glBindBuffer(GL_ARRAY_BUFFER, bufN[0]);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vvSize, vvp, GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ARRAY_BUFFER, bufN[1]);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * uvSize, uvp, GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  _vboMap[name] = VBO(bufN[0], bufN[1]);
 }
 
 void Graphics::Init(Game *game, Point size)
@@ -60,7 +101,8 @@ void Graphics::Init(Game *game, Point size)
   _size = size;
 
   initGL();
-  loadTextures();
+  loadObjectData();
+  loadVertex(vertices, 4*3, uvs, 4*2, DEFAULT_VBO);
 }
 
 GLuint Graphics::loadTexture(std::string texName)
@@ -95,7 +137,15 @@ void Graphics::LoadTexture(std::string texName)
   _textureMap[texName] = loadTexture(texName);
 }
 
-void Graphics::draw(GLuint tInd, Point pos, Point size)
+std::vector<GLubyte> glUBrange(unsigned int r)
+{
+  std::vector<GLubyte> vec;
+  for(unsigned int i = 0; i < r; i++)
+    vec.push_back(i);
+  return vec;
+}
+
+void Graphics::draw(GLuint tInd, GLuint vBuf, GLuint tBuf, unsigned int vCount, Point pos, Point size)
 {
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
@@ -103,11 +153,19 @@ void Graphics::draw(GLuint tInd, Point pos, Point size)
   glTranslatef( pos.X(),  pos.Y(), -1.0f);
   glScalef    (size.X(), size.Y(),  1.f);
 
-  glVertexPointer  (3, GL_FLOAT, 0, vertices);
-  glTexCoordPointer(2, GL_FLOAT, 0, uvs);
-
   glBindTexture(GL_TEXTURE_2D, tInd);
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vBuf);
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, 0);
+
+  glBindBuffer(GL_ARRAY_BUFFER, tBuf);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glTexCoordPointer(2, GL_FLOAT, 0, 0);
+
+  std::vector<GLubyte>& indV = glUBrange(vCount);
+  
+  glDrawArrays(GL_TRIANGLE_FAN, 0, vCount);
 }
 
 Point Graphics::posToScreen(Point p)
@@ -129,28 +187,46 @@ void Graphics::drawObject(GameObject& obj)
   Point posScreen =  posToScreen(obj.GetPosition());
   Point sizScreen = sizeToScreen(obj.GetSize());
 
-  draw(_textureMap[obj.GetTexture()], posScreen, sizScreen);
+  unsigned int vCount = obj.GetVertexArray().size();
 
+  if(_textureMap.count(obj.GetTexture()) < 1)
+    LoadTexture(obj.GetTexture());
+
+  std::string vboName = obj.GetName();
+
+  if(vCount > 0)
+  {
+    if(_vboMap.count(obj.GetName()) < 1)
+      LoadVertex(obj.GetName(), obj.GetVertexArray());
+  }
+  else
+  {
+    vboName = DEFAULT_VBO;
+    vCount  = 4;
+  }
+
+  GLuint tex = _textureMap[obj.GetTexture()];
+  VBO vbo = _vboMap[vboName];
+
+  draw(tex, vbo._v, vbo._t, vCount, posScreen, sizScreen);
   {
     float x = obj.GetPosition().X();
     float y = obj.GetPosition().Y();
-    
+
     float xs2 = obj.GetSize().X() / 2.f;
     float ys2 = obj.GetSize().Y() / 2.f;
 
-    GLuint &tex = _textureMap[obj.GetTexture()];
-
     if(x > 1.f - xs2)
-      draw(tex, posToScreen(Point(x - 1.f, y      )), sizScreen);
+      draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x - 1.f, y)), sizScreen);
 
     if(x < 0.f + xs2)
-      draw(tex, posToScreen(Point(x + 1.f, y      )), sizScreen);
+      draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x + 1.f, y)), sizScreen);
 
     if(y > 1.f - ys2)
-      draw(tex, posToScreen(Point(x,       y - 1.f)), sizScreen);
+      draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x, y - 1.f)), sizScreen);
 
     if(y < 0.f + ys2)
-      draw(tex, posToScreen(Point(x,       y + 1.f)), sizScreen);
+      draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x, y + 1.f)), sizScreen);
   }
 }
 

@@ -13,7 +13,10 @@ float dt(clock_t first, clock_t second)
   return (float(first) - float(second)) / CLOCKS_PER_SEC;
 }
 
-
+Point Point::operator/(float val)
+{
+  return Point(_x / val, _y / val);
+}
 
 Point Point::operator*(float val)
 {

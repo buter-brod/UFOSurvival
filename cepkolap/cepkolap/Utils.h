@@ -13,13 +13,16 @@ class Point
 public:
   Point()                : _x(0.f), _y(0.f) {}
   Point(float x, float y): _x(x),   _y(y)   {}
-
-  Point operator* (float val);
+  
   Point operator+ (Point p);
   Point operator- (Point p);
   void  operator+=(Point p);
   void  operator*=(Point p);
+  
   void  operator*=(float val);
+  Point operator* (float val);
+  Point operator/ (float val);
+
   Point normalized();
 
   float& X()    { return _x; }

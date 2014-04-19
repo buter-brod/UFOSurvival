@@ -1,5 +1,5 @@
 #include "Game.h"
-#include "GameObject.h"
+#include "Asteroid.h"
 #include <algorithm>
 
 float DELAY = 1.f / FPS;
@@ -22,15 +22,23 @@ void Game::addObject(GameObject &obj)
 
 void Game::InitObjects()
 {
-  GameObject bg    = GameObject("background", Point(_ratio, 1.0f),  "sky.png", Point(0.5f, 0.5f), 0);
-  GameObject hero  = GameObject("hero",       Point(0.15f, 0.075f), "UFO.png", Point(0.8f, 0.8f), 1);
+  GameObject bg  ("background", "sky.png",      0);
+  GameObject hero("hero",       "spaceowl.png", 1);
 
-
-  //hero.SetSpeed(Point(-0.3f, 0.f));
-  //hero.SetAcceleration(Point(0.1f, -0.01f));
+  hero.SetSize    (Point(0.125f, 0.075f));
+  bg  .SetSize    (Point(_ratio, 1.0f));
+  hero.SetPosition(Point(0.8f, 0.8f));
+  bg  .SetPosition(Point(0.5f, 0.5f));
+  
+  Asteroid as1("1");
+  as1.SetSize(Point(0.15f, 0.15f));
+  as1.SetPosition(Point(0.2f, 0.2f));
+  as1.SetSpeed(Point(0.04f, 0.04f));
 
   addObject(hero);
-  addObject(bg);  
+  addObject(bg);
+
+  addObject(as1);
 
   _hero = &(++_objects.begin())->second;
 
@@ -58,7 +66,6 @@ void Game::Update()
 
 void Game::Shoot(Point at)
 {
-
 }
 
 Point Game::scpt(Point p)

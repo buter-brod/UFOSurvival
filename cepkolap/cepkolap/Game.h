@@ -10,7 +10,7 @@ class Game
 public:
   Game();
 
-  std::map<int, GameObject>& Objects() { return _objects; }
+  std::multimap<int, GameObject>& Objects() { return _objects; }
   void Update();
   void SetRatio(float r);
   void InitObjects();
@@ -26,7 +26,7 @@ protected:
   // repair X of current point with current ratio
   Point scpt(Point p);
 
-  std::map<int, GameObject> _objects;
+  std::multimap<int, GameObject> _objects;
   GameObject *_hero;
   
   float _ratio;

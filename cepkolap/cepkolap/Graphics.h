@@ -1,9 +1,11 @@
 #ifndef _GRAPHICS_H_
 #define _GRAPHICS_H_
 
+#include <glew.h>
 #include <glut.h>
 #include <map>
 #include <time.h>
+#include <vector>
 #include "Game.h"
 
 class Graphics
@@ -13,19 +15,29 @@ public:
   void LoadTexture(std::string texName);  
   void Frame();
   void Init(Game *game, Point size);
+  void LoadVertex(std::string name, std::vector<Point> &vVec);
 
 protected:
   
   void initGL();
-  void loadTextures();
+  void loadVertex(GLvoid *vvp, unsigned int vvSize, GLvoid *uvp, unsigned int uvSize, std::string name);
+  void loadObjectData();
   void frame();
   void drawObject(GameObject& obj);
-  void draw(GLuint tInd, Point pos, Point sz);
+  void draw(GLuint tInd, GLuint vBuf, GLuint tBuf, unsigned int fCount, Point pos, Point sz);
   GLuint loadTexture(std::string texName);
   Point posToScreen (Point p);
   Point sizeToScreen(Point p);
   Point _size;
   std::map<std::string, GLuint> _textureMap;
+
+  struct VBO
+  {
+    VBO(GLuint v = 0, GLuint t = 0) : _v(v), _t(t) {}
+    GLuint _v, _t;
+  };
+
+  std::map<std::string, VBO> _vboMap;
 
   Game *_game;
   

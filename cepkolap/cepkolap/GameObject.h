@@ -2,14 +2,14 @@
 #define _GAMEOBJECT_H_
 
 #include "Utils.h"
+#include <vector>
 
 class GameObject
 {
 public:
-  GameObject(std::string name, Point size, std::string texture, Point position, int z);
-  GameObject();
+  GameObject(std::string name, std::string texture, int z);
   ~GameObject();
-
+  
   void Update(float time);
 
   Point       GetSize    () { return _size;     }
@@ -18,6 +18,8 @@ public:
   std::string GetTexture () { return _texture;  }
   std::string GetName    () { return _name;     }
   int         GetZ       () { return _z;        }
+
+  std::vector<Point>& GetVertexArray() {return _vertArray;}
 
   void SetPosition    (Point ps) { _position     =  ps; }
   void SetSize        (Point sz) { _size         =  sz; }
@@ -32,6 +34,8 @@ protected:
   int _z;
   std::string _texture;
   std::string _name;
+
+  std::vector<Point> _vertArray;
 };
 
 #endif
