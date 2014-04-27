@@ -15,16 +15,19 @@ public:
   void LoadTexture(std::string texName);  
   void Frame();
   void Init(Game *game, Point size);
-  void LoadVertex(std::string name, std::vector<Point> &vVec);
+  void LoadVertex(IDType id, std::vector<Point> &vVec);
 
 protected:
   
   void initGL();
-  void loadVertex(GLvoid *vvp, unsigned int vvSize, GLvoid *uvp, unsigned int uvSize, std::string name);
+  void loadVertex(GLvoid *vvp, unsigned int vvSize, GLvoid *uvp, unsigned int uvSize, IDType id);
   void loadObjectData();
+  void loadObjectData(GameObject& obj);
+  void loadObjectData(ObjectList& objects);
   void frame();
-  void drawObject(GameObject& obj);
-  void draw(GLuint tInd, GLuint vBuf, GLuint tBuf, unsigned int fCount, Point pos, Point sz);
+  void drawObjects(ObjectList& objects);
+  void drawObject (GameObject& obj);
+  void draw(GLuint tInd, GLuint vBuf, GLuint tBuf, unsigned int fCount, Point pos, Point sz, float opacity);
   GLuint loadTexture(std::string texName);
   Point posToScreen (Point p);
   Point sizeToScreen(Point p);
@@ -37,7 +40,15 @@ protected:
     GLuint _v, _t;
   };
 
-  std::map<std::string, VBO> _vboMap;
+  struct VBOData
+  {
+    std::map<IDType, VBO> _vboMap;
+    IDType _defaultVBOID;
+    bool initWithDefault = false;
+  };
+
+  VBOData _vboData;
+  
 
   Game *_game;
   

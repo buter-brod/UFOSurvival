@@ -4,20 +4,29 @@
 #include "Utils.h"
 #include <vector>
 
+typedef unsigned long IDType;
+// sufficent for 40 days creating one ID per millisecond
+
 class GameObject
 {
 public:
-  GameObject(std::string name, std::string texture, int z);
-  ~GameObject();
+  GameObject(IDType id, std::string texture);
   
-  void Update(float time);
+  bool operator==(const GameObject& obj) const;
+  bool operator!=(const GameObject& obj) const;
 
-  Point       GetSize    () { return _size;     }
-  Point       GetPosition() { return _position; }
-  Point       GetSpeed   () { return _speed;    }
-  std::string GetTexture () { return _texture;  }
-  std::string GetName    () { return _name;     }
-  int         GetZ       () { return _z;        }
+  void Update(float time);
+  void Destroy();
+  
+  float GetDestroyProgress();
+  bool IsDestroyed() {return _destroyed;}
+
+  Point       GetSize    () const { return _size;     }
+  Point       GetPosition() const { return _position; }
+  Point       GetSpeed   () const { return _speed;    }
+
+  std::string GetTexture () const { return _texture;  }
+  IDType      GetID      () const { return _id;       }
 
   std::vector<Point>& GetVertexArray() {return _vertArray;}
 
@@ -25,16 +34,23 @@ public:
   void SetSize        (Point sz) { _size         =  sz; }
   void SetSpeed       (Point sp) { _speed        =  sp; }
   void SetAcceleration(Point ac) { _acceleration =  ac; }
+
+  void SetMaxLifeTime (float tm) { _maxLifeTime = tm;   }
   
 protected:
   Point _size;
   Point _position;
   Point _speed;
   Point _acceleration;
-  int _z;
-  std::string _texture;
-  std::string _name;
 
+  std::string _texture;
+  IDType _id;
+  bool  _destroyed = false;
+
+  float _destroyedSAgo = -1.f;
+  float _lifeTime = 0.f;
+  float _maxLifeTime = -1.f;
+  
   std::vector<Point> _vertArray;
 };
 

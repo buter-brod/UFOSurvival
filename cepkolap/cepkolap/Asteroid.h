@@ -6,11 +6,12 @@
 class Asteroid : public GameObject
 {
 public:
-  Asteroid(std::string name);
-  ~Asteroid();
+  Asteroid(IDType id, std::string texture);
 
 protected:
   void generatePoly();
+
+  bool _cracked = false; // means it's a part of some larger asteroid that has been shot already
 };
 
 

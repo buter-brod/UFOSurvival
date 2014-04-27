@@ -3,8 +3,20 @@
 
 #include <string>
 #include <time.h>
+#include <cmath>
 
 #define FPS 120.f
+
+float rnd01 ();
+float rnd0xf(float x);
+int   rnd0xi(int   x);
+float rndfMinMax(float min, float max);
+
+/*
+rnd01  is random value 0..1
+rnd0xf  is random value 0..x
+rnd0xi is random integer value 0..x
+*/
 
 float dt(clock_t first, clock_t second);
 

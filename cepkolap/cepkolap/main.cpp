@@ -23,22 +23,27 @@ void idle()
 
 void mouseClick(int button, int state, int x, int y)
 {
+  Point pos(float(x) / SCREEN_W, 1.f - float(y) / SCREEN_H);
+
   if(button == GLUT_RIGHT_BUTTON)
   {
     if(state == GLUT_DOWN)
     {
-      Point pos(float(x) / SCREEN_W, 1.f - float(y) / SCREEN_H);
       g_game.EngineFly(pos);
       g_flying = true;
     }
     else if(state == GLUT_UP)
     {
-      g_game.StopEngine();
+      g_game.EngineStop();
       g_flying = false;
     }
   }
-  else
+  else if (button == GLUT_LEFT_BUTTON)
   {
+    if(state == GLUT_DOWN)
+    {
+      g_game.Shoot(pos);
+    }
   }
 }
 

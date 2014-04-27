@@ -41,24 +41,38 @@ void Graphics::initGL()
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   glEnable(GL_TEXTURE_2D);
-  glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, /*GL_REPLACE*/ GL_MODULATE);
+  glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
   glFrontFace(GL_CW);
   glShadeModel(GL_SMOOTH);
 }
-void Graphics::loadObjectData()
-{
-  for(auto objPair : _game->Objects())
-  {
-    GameObject &obj = objPair.second;
-    LoadTexture(obj.GetTexture());
 
-    if(!obj.GetVertexArray().empty())
-      LoadVertex(obj.GetName(), obj.GetVertexArray());
-  }
+void Graphics::loadObjectData(GameObject& obj)
+{
+  LoadTexture(obj.GetTexture());
+
+  if(!obj.GetVertexArray().empty())
+    LoadVertex(obj.GetID(), obj.GetVertexArray());
 }
 
-void Graphics::LoadVertex(std::string name, std::vector<Point> &vVec)
+void Graphics::loadObjectData(ObjectList& objects)
+{
+  for(GameObject& obj : objects)
+    loadObjectData(obj);
+}
+
+void Graphics::loadObjectData()
+{
+  loadObjectData(_game->GetAsteroids());
+  loadObjectData(_game->GetBullets());
+  
+  loadObjectData(_game->GetBlackObject());
+  loadObjectData(_game->GetBackgroundObject());
+  loadObjectData(_game->GetHeroObject());
+  loadObjectData(_game->GetGameOverObject());
+}
+
+void Graphics::LoadVertex(IDType id, std::vector<Point> &vVec)
 {
   std::vector<float> vertexVecFlat, uvVecFlat;
 
@@ -71,14 +85,14 @@ void Graphics::LoadVertex(std::string name, std::vector<Point> &vVec)
     uvVecFlat.push_back((p.X() + 1) / 2);
     uvVecFlat.push_back((p.Y() + 1) / 2);
   }
-  loadVertex(vertexVecFlat.data(), vertexVecFlat.size(), uvVecFlat.data(), uvVecFlat.size(), name);
+  loadVertex(vertexVecFlat.data(), vertexVecFlat.size(), uvVecFlat.data(), uvVecFlat.size(), id);
 }
 
-void Graphics::loadVertex(GLvoid *vvp, unsigned int vvSize, GLvoid *uvp, unsigned int uvSize, std::string name)
+void Graphics::loadVertex(GLvoid *vvp, unsigned int vvSize, GLvoid *uvp, unsigned int uvSize, IDType id)
 {
-  if(_vboMap.count(name) > 0)
+  if(_vboData._vboMap.count(id) > 0)
   {
-    Log::Print("VBO " + name + " already exists with ids=" + Utils::ToString(_vboMap[name]._t) + "," + Utils::ToString(_vboMap[name]._v));
+    Log::Print("VBO " + Utils::ToString(id) + " already exists with ids=" + Utils::ToString(_vboData._vboMap[id]._t) + "," + Utils::ToString(_vboData._vboMap[id]._v));
     return;
   }
 
@@ -92,7 +106,7 @@ void Graphics::loadVertex(GLvoid *vvp, unsigned int vvSize, GLvoid *uvp, unsigne
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-  _vboMap[name] = VBO(bufN[0], bufN[1]);
+  _vboData._vboMap[id] = VBO(bufN[0], bufN[1]);
 }
 
 void Graphics::Init(Game *game, Point size)
@@ -102,7 +116,6 @@ void Graphics::Init(Game *game, Point size)
 
   initGL();
   loadObjectData();
-  loadVertex(vertices, 4*3, uvs, 4*2, DEFAULT_VBO);
 }
 
 GLuint Graphics::loadTexture(std::string texName)
@@ -145,13 +158,15 @@ std::vector<GLubyte> glUBrange(unsigned int r)
   return vec;
 }
 
-void Graphics::draw(GLuint tInd, GLuint vBuf, GLuint tBuf, unsigned int vCount, Point pos, Point size)
+void Graphics::draw(GLuint tInd, GLuint vBuf, GLuint tBuf, unsigned int vCount, Point pos, Point size, float opacity)
 {
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
    
   glTranslatef( pos.X(),  pos.Y(), -1.0f);
   glScalef    (size.X(), size.Y(),  1.f);
+
+  glColor4f(1.0, 1.0, 1.0, opacity);
 
   glBindTexture(GL_TEXTURE_2D, tInd);
 
@@ -182,6 +197,12 @@ Point Graphics::sizeToScreen(Point p)
     p.Y());
 }
 
+void Graphics::drawObjects(ObjectList& objects)
+{
+  for (GameObject& obj : objects)
+    drawObject(obj);
+}
+
 void Graphics::drawObject(GameObject& obj)
 {
   Point posScreen =  posToScreen(obj.GetPosition());
@@ -192,24 +213,34 @@ void Graphics::drawObject(GameObject& obj)
   if(_textureMap.count(obj.GetTexture()) < 1)
     LoadTexture(obj.GetTexture());
 
-  std::string vboName = obj.GetName();
+  IDType vboID = obj.GetID();
 
   if(vCount > 0)
   {
-    if(_vboMap.count(obj.GetName()) < 1)
-      LoadVertex(obj.GetName(), obj.GetVertexArray());
+    if(_vboData._vboMap.count(obj.GetID()) < 1)
+      LoadVertex(obj.GetID(), obj.GetVertexArray()); // object looks not pre-initialized, so let's load vertex data right now.
   }
   else
   {
-    vboName = DEFAULT_VBO;
+    if (!_vboData.initWithDefault)
+    {
+      _vboData._defaultVBOID = obj.GetID();
+      loadVertex(vertices, 4*3, uvs, 4*2, _vboData._defaultVBOID);
+      _vboData.initWithDefault = true;
+    }
+    else
+      vboID = _vboData._defaultVBOID; // object has no its own vertex data, so we'll use default -1..1 rectangle
+
     vCount  = 4;
   }
 
   GLuint tex = _textureMap[obj.GetTexture()];
-  VBO vbo = _vboMap[vboName];
+  VBO vbo = _vboData._vboMap[vboID];
+  float opacity = 1.f - obj.GetDestroyProgress();
 
-  draw(tex, vbo._v, vbo._t, vCount, posScreen, sizScreen);
-  {
+  draw(tex, vbo._v, vbo._t, vCount, posScreen, sizScreen, opacity);
+
+  /*{
     float x = obj.GetPosition().X();
     float y = obj.GetPosition().Y();
 
@@ -217,17 +248,18 @@ void Graphics::drawObject(GameObject& obj)
     float ys2 = obj.GetSize().Y() / 2.f;
 
     if(x > 1.f - xs2)
-      draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x - 1.f, y)), sizScreen);
+      draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x - 1.f, y)), sizScreen, opacity);
 
     if(x < 0.f + xs2)
-      draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x + 1.f, y)), sizScreen);
+      draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x + 1.f, y)), sizScreen, opacity);
 
     if(y > 1.f - ys2)
-      draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x, y - 1.f)), sizScreen);
+      draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x, y - 1.f)), sizScreen, opacity);
 
     if(y < 0.f + ys2)
-      draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x, y + 1.f)), sizScreen);
-  }
+      draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x, y + 1.f)), sizScreen, opacity);
+    
+  }*/
 }
 
 void Graphics::frame()
@@ -235,8 +267,22 @@ void Graphics::frame()
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  for(auto obj : _game->Objects())
-    drawObject(obj.second);
+  {
+    drawObject(_game->GetBackgroundObject());
+
+    if(!_game->IsGameOver())
+    {
+      drawObject(_game->GetHeroObject());
+
+      drawObjects(_game->GetAsteroids());
+      drawObjects(_game->GetBullets());
+    }
+    else
+    {
+      drawObject(_game->GetBlackObject());
+      drawObject(_game->GetGameOverObject());
+    }
+  }
 
   glFlush();
 }

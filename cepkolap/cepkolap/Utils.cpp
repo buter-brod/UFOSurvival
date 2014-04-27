@@ -1,5 +1,21 @@
 #include "Utils.h"
 #include <sstream>
+#include <random>
+
+static const float RANDOM_STRENGTH = 5000.f;
+
+unsigned int rnd()
+{
+  static std::default_random_engine rng(std::random_device{}());
+  static std::uniform_real_distribution<float> dist(0, RANDOM_STRENGTH);
+  return unsigned int(dist(rng));
+}
+
+float rnd01 ()        { return float(rnd()) / RANDOM_STRENGTH; }
+float rnd0xf(float x) { return rnd01() * x; }
+int   rnd0xi(int   x) { return rnd()   % x; }
+
+float rndfMinMax(float min, float max) { return min + rnd01() * (max - min); }
 
 std::string Utils::ToString(unsigned int i)
 {
