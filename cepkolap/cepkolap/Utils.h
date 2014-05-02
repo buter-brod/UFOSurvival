@@ -28,9 +28,13 @@ public:
   
   Point operator+ (Point p);
   Point operator- (Point p);
-  void  operator+=(Point p);
-  void  operator*=(Point p);
+  Point operator* (Point p);
   
+  void  operator-=(Point p);
+  void  operator+=(Point p);
+  
+  void  operator*=(Point p);
+
   void  operator*=(float val);
   Point operator* (float val);
   Point operator/ (float val);

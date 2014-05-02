@@ -41,8 +41,7 @@ protected:
   Point scpt(Point p);
 
   IDType newID();
-
-  void checkDestroyedObjects(ObjectList& objects);
+  
   void checkGameOver();
 
   ObjectList _asteroids, _bullets;

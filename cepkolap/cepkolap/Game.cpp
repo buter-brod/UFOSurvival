@@ -9,7 +9,7 @@ static const float ENGINE_POWER    = 0.5f;
 static const float BULLET_SPEED    = 0.5f;
 static const float BULLET_LIFETIME = 1.5f;
 
-static const unsigned int ASTEROIDS_MIN = 5;
+static const unsigned int ASTEROIDS_MIN = 4;
 
 static const Point BULLET_SIZE   (0.02f,  0.02f);
 static const Point HERO_SIZE     (0.125f, 0.075f);
@@ -82,15 +82,9 @@ void Game::InitObjects()
   }
 }
 
-void Game::checkDestroyedObjects(ObjectList& objects)
+void checkDestroyedObjects(ObjectList& objects)
 {
-  std::vector<IDType> toDelete;
-  for(auto obj : objects)
-    if(obj.GetDestroyProgress() >= 1.f)
-      toDelete.push_back(obj.GetID());
-
-  for(IDType &n : toDelete)
-    objects.erase(std::find_if(objects.begin(), objects.end(), [&n](const GameObject &o){return o.GetID() == n;}));
+  objects.remove_if([](const GameObject &o) {return o.GetDestroyProgress() >= 1.f;});
 }
 
 void Game::Update()
@@ -113,17 +107,20 @@ void Game::Update()
     {
       asteroid.Update(elapsed);
 
-      if(!asteroid.IsDestroyed() && Collider::isBBoxOverlapping(_heroObject, asteroid))
-        _heroObject.Destroy();
+      if(!asteroid.IsDestroyed() && Collider::Collides(_heroObject, asteroid, Point(), Point())) //GOD MODE :D
+        _heroObject.Destroy();  
 
       for (GameObject& bullet : _bullets)
+      {
+        Point coll1, coll2;
         if(!asteroid.IsDestroyed() && 
            !bullet  .IsDestroyed() && 
-           Collider::isBBoxOverlapping(bullet, asteroid))
+           Collider::Collides(bullet, asteroid, coll1, coll2))
         {
           asteroid.Destroy();
           bullet  .Destroy();
         }
+      }
     }
     while (_asteroids.size() < ASTEROIDS_MIN)
       addObject(Asteroid(newID(), TEXTURE_ASTEROID), GetAsteroids());

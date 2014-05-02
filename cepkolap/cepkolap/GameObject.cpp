@@ -53,7 +53,7 @@ bool GameObject::operator!=(const GameObject& obj) const
   return !(*this == obj);
 }
 
-float GameObject::GetDestroyProgress()
+float GameObject::GetDestroyProgress() const
 {
   if (!_destroyed)
     return 0.f;

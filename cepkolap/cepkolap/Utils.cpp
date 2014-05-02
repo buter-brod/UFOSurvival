@@ -44,6 +44,11 @@ Point Point::operator+(Point p)
   return Point(_x + p.X(), _y + p.Y());
 }
 
+Point Point::operator*(Point p)
+{
+  return Point(_x * p.X(), _y * p.Y());
+}
+
 Point Point::operator-(Point p)
 {
   return Point(_x - p.X(), _y - p.Y());
@@ -53,6 +58,12 @@ void Point::operator+=(Point p)
 {
   _x += p.X();
   _y += p.Y();
+}
+
+void Point::operator-=(Point p)
+{
+  _x -= p.X();
+  _y -= p.Y();
 }
 
 void Point::operator*=(Point p)

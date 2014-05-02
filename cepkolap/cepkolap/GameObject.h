@@ -7,6 +7,8 @@
 typedef unsigned long IDType;
 // sufficent for 40 days creating one ID per millisecond
 
+typedef std::vector<Point> VArr;
+
 class GameObject
 {
 public:
@@ -18,7 +20,7 @@ public:
   void Update(float time);
   void Destroy();
   
-  float GetDestroyProgress();
+  float GetDestroyProgress() const;
   bool IsDestroyed() {return _destroyed;}
 
   Point       GetSize    () const { return _size;     }
@@ -28,7 +30,7 @@ public:
   std::string GetTexture () const { return _texture;  }
   IDType      GetID      () const { return _id;       }
 
-  std::vector<Point>& GetVertexArray() {return _vertArray;}
+  VArr& GetVArray() {return _vertArray;}
 
   void SetPosition    (Point ps) { _position     =  ps; }
   void SetSize        (Point sz) { _size         =  sz; }
@@ -51,7 +53,7 @@ protected:
   float _lifeTime = 0.f;
   float _maxLifeTime = -1.f;
   
-  std::vector<Point> _vertArray;
+  VArr _vertArray;
 };
 
 #endif

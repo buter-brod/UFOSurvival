@@ -51,8 +51,8 @@ void Graphics::loadObjectData(GameObject& obj)
 {
   LoadTexture(obj.GetTexture());
 
-  if(!obj.GetVertexArray().empty())
-    LoadVertex(obj.GetID(), obj.GetVertexArray());
+  if(!obj.GetVArray().empty())
+    LoadVertex(obj.GetID(), obj.GetVArray());
 }
 
 void Graphics::loadObjectData(ObjectList& objects)
@@ -72,7 +72,7 @@ void Graphics::loadObjectData()
   loadObjectData(_game->GetGameOverObject());
 }
 
-void Graphics::LoadVertex(IDType id, std::vector<Point> &vVec)
+void Graphics::LoadVertex(IDType id, VArr &vVec)
 {
   std::vector<float> vertexVecFlat, uvVecFlat;
 
@@ -208,7 +208,7 @@ void Graphics::drawObject(GameObject& obj)
   Point posScreen =  posToScreen(obj.GetPosition());
   Point sizScreen = sizeToScreen(obj.GetSize());
 
-  unsigned int vCount = obj.GetVertexArray().size();
+  unsigned int vCount = obj.GetVArray().size();
 
   if(_textureMap.count(obj.GetTexture()) < 1)
     LoadTexture(obj.GetTexture());
@@ -218,7 +218,7 @@ void Graphics::drawObject(GameObject& obj)
   if(vCount > 0)
   {
     if(_vboData._vboMap.count(obj.GetID()) < 1)
-      LoadVertex(obj.GetID(), obj.GetVertexArray()); // object looks not pre-initialized, so let's load vertex data right now.
+      LoadVertex(obj.GetID(), obj.GetVArray()); // object looks not pre-initialized, so let's load vertex data right now.
   }
   else
   {

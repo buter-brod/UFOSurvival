@@ -47,8 +47,8 @@ Asteroid::Asteroid(IDType id, std::string tex)
 
   Point speed = (direction - pos).normalized() * rndfMinMax(ASTEROID_MIN_SPEED, ASTEROID_MAX_SPEED);
 
-  SetSize(size);
-  SetSpeed(speed);
+  SetSize    (size);
+  SetSpeed   (speed);
   SetPosition(pos);
 }
 
@@ -58,12 +58,12 @@ void Asteroid::generatePoly()
 
   while (curAngle < 2.f * PI)
   {
-    curAngle += rnd01() * PI_2;
-
     float x = 1.f * cos(curAngle);
     float y = 1.f * sin(curAngle);
 
     Point p(x, y);
     _vertArray.push_back(p);
+
+    curAngle += rnd01() * PI_2;
   }
 }
