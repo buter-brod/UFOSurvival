@@ -3,7 +3,6 @@
 
 #include <string>
 #include <time.h>
-#include <cmath>
 
 #define FPS 120.f
 
@@ -30,16 +29,19 @@ public:
   Point operator- (Point p);
   Point operator* (Point p);
   
+  Point operator-();
   void  operator-=(Point p);
   void  operator+=(Point p);
   
   void  operator*=(Point p);
+  void  operator/=(Point p);
 
   void  operator*=(float val);
   Point operator* (float val);
   Point operator/ (float val);
 
   Point normalized();
+  float len();
 
   float& X()    { return _x; }
   float& Y()    { return _y; }
@@ -51,11 +53,15 @@ protected:
   float _x, _y;
 };
 
-class Utils
+struct CrackSpot
 {
-public:
-  static std::string ToString(unsigned int i);
-
+  CrackSpot(){}
+  CrackSpot(Point &p, unsigned int &i): _p(p), _i(i) {}
+  Point _p;
+  unsigned int _i; // index of last polygon vertex CCW
 };
+typedef CrackSpot CrackSpots[2];
+
+std::string ToString(unsigned int i);
 
 #endif

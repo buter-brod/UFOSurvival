@@ -1,11 +1,10 @@
 #include "Graphics.h"
+
 #include <FreeImage.h>
-#include "Utils.h"
+
 #include "Log.h"
 
 static float DELAY = 1.f / FPS;
-
-#define DEFAULT_VBO "quad"
 
 static GLfloat vertices[4][3] =
 {
@@ -82,8 +81,8 @@ void Graphics::LoadVertex(IDType id, VArr &vVec)
     vertexVecFlat.push_back(p.Y());
     vertexVecFlat.push_back(0.f);
 
-    uvVecFlat.push_back((p.X() + 1) / 2);
-    uvVecFlat.push_back((p.Y() + 1) / 2);
+    uvVecFlat.push_back((p.X() + 1.f) / 2.f);
+    uvVecFlat.push_back((p.Y() + 1.f) / 2.f);
   }
   loadVertex(vertexVecFlat.data(), vertexVecFlat.size(), uvVecFlat.data(), uvVecFlat.size(), id);
 }
@@ -92,7 +91,7 @@ void Graphics::loadVertex(GLvoid *vvp, unsigned int vvSize, GLvoid *uvp, unsigne
 {
   if(_vboData._vboMap.count(id) > 0)
   {
-    Log::Print("VBO " + Utils::ToString(id) + " already exists with ids=" + Utils::ToString(_vboData._vboMap[id]._t) + "," + Utils::ToString(_vboData._vboMap[id]._v));
+    Log::Print("VBO " + ToString(id) + " already exists with ids=" + ToString(_vboData._vboMap[id]._t) + "," + ToString(_vboData._vboMap[id]._v));
     return;
   }
 
@@ -142,20 +141,10 @@ GLuint Graphics::loadTexture(std::string texName)
 
 void Graphics::LoadTexture(std::string texName)
 {
-  if(_textureMap.count(texName) > 0)
-  {
-    Log::Print("Texture " + texName + " already exists with id=" + Utils::ToString(_textureMap[texName]));
-    return;
-  }
-  _textureMap[texName] = loadTexture(texName);
-}
-
-std::vector<GLubyte> glUBrange(unsigned int r)
-{
-  std::vector<GLubyte> vec;
-  for(unsigned int i = 0; i < r; i++)
-    vec.push_back(i);
-  return vec;
+  if(_textureMap.count(texName) == 0)
+    _textureMap[texName] = loadTexture(texName);
+  else
+    Log::Print("Texture " + texName + " already exists with id=" + ToString(_textureMap[texName]));
 }
 
 void Graphics::draw(GLuint tInd, GLuint vBuf, GLuint tBuf, unsigned int vCount, Point pos, Point size, float opacity)
@@ -178,8 +167,6 @@ void Graphics::draw(GLuint tInd, GLuint vBuf, GLuint tBuf, unsigned int vCount, 
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glTexCoordPointer(2, GL_FLOAT, 0, 0);
 
-  std::vector<GLubyte>& indV = glUBrange(vCount);
-  
   glDrawArrays(GL_TRIANGLE_FAN, 0, vCount);
 }
 
@@ -218,20 +205,20 @@ void Graphics::drawObject(GameObject& obj)
   if(vCount > 0)
   {
     if(_vboData._vboMap.count(obj.GetID()) < 1)
-      LoadVertex(obj.GetID(), obj.GetVArray()); // object looks not pre-initialized, so let's load vertex data right now.
+      LoadVertex(obj.GetID(), obj.GetVArray()); // object looks like not pre-initialized, so let's load vertex data right now.
   }
   else
   {
     if (!_vboData.initWithDefault)
-    {
+    {// this object will be the first to use 'default' VBO (rectangle -1..1), we'll remember its ID as a reference for all future objects that have no their own vertex data
       _vboData._defaultVBOID = obj.GetID();
       loadVertex(vertices, 4*3, uvs, 4*2, _vboData._defaultVBOID);
       _vboData.initWithDefault = true;
     }
     else
-      vboID = _vboData._defaultVBOID; // object has no its own vertex data, so we'll use default -1..1 rectangle
+      vboID = _vboData._defaultVBOID; // object has no its own vertex data, so let's use default VBO reference that was initialized by the same 'rectangle'-based object somewhen before
 
-    vCount  = 4;
+    vCount = 4;
   }
 
   GLuint tex = _textureMap[obj.GetTexture()];
@@ -248,18 +235,17 @@ void Graphics::drawObject(GameObject& obj)
     float ys2 = obj.GetSize().Y() / 2.f;
 
     if(x > 1.f - xs2)
-      draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x - 1.f, y)), sizScreen, opacity);
+    draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x - 1.f, y)), sizScreen, opacity);
 
     if(x < 0.f + xs2)
-      draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x + 1.f, y)), sizScreen, opacity);
+    draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x + 1.f, y)), sizScreen, opacity);
 
     if(y > 1.f - ys2)
-      draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x, y - 1.f)), sizScreen, opacity);
+    draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x, y - 1.f)), sizScreen, opacity);
 
     if(y < 0.f + ys2)
-      draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x, y + 1.f)), sizScreen, opacity);
-    
-  }*/
+    draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x, y + 1.f)), sizScreen, opacity);
+    }*/
 }
 
 void Graphics::frame()

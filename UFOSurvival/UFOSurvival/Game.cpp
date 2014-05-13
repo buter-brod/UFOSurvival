@@ -1,7 +1,6 @@
 #include "Game.h"
 #include "Asteroid.h"
 #include "Collider.h"
-#include <algorithm>
 
 static const float DELAY = 1.f / FPS;
 
@@ -47,9 +46,11 @@ Point Game::scpt(Point p)
   return Point(p.X() / _ratio, p.Y());
 }
 
-void Game::addObject(GameObject &obj, ObjectList& objects)
+void Game::addObject(GameObject &obj, ObjectList& objects, bool fixObjSize)
 {
-  fixObjectXSize   (obj);
+  if (fixObjSize)
+    fixObjectXSize(obj);
+
   objects.push_back(obj);
 }
 
@@ -72,19 +73,56 @@ void Game::InitObjects()
     fixObjectXSize(_gameOverObject  );
     fixObjectXSize(_blackObject     );
   }
-   
-  //_hero = &std::find_if(_objects.begin(), _objects.end(), [hero](std::pair<int, GameObject> &o) -> bool {return o.second.GetName() == hero.GetName();})->second;
-
-  {
-    //GameObject border = GameObject("border", Point(1.0f, 1.0f), "border.png", 1);
-    //border.SetPosition(Point(0.5f, 0.5f));
-    //addObject(border);
-  }
 }
 
 void checkDestroyedObjects(ObjectList& objects)
 {
   objects.remove_if([](const GameObject &o) {return o.GetDestroyProgress() >= 1.f;});
+}
+
+void makeCrackedPoly(VArr inputVArr, CrackSpots crSp, unsigned int first, VArr &arr)
+{
+  unsigned int second = (first + 1) % 2;
+
+  arr.push_back(crSp[first]._p);
+
+  for(unsigned int i = crSp[first]._i; i != crSp[second]._i;)
+  {
+    i = (i + 1) % inputVArr.size();
+    arr.push_back(inputVArr[i]);
+  }
+  arr.push_back(crSp[second]._p);
+}
+
+void Game::crackAsteroid(ObjectList& added, GameObject& asteroid, GameObject& bullet, CrackSpots& crSp)
+{
+  VArr newArrs[2];
+  VArr& arr = asteroid.GetVArray();
+
+  Point crackSegmentVec = crSp[0]._p - crSp[1]._p;
+  Point orthoSpeed = Point(- crackSegmentVec.Y(), crackSegmentVec.X()).normalized() * asteroid.GetSpeed().len() / 2.f;
+  // getting perpendicular vec to speed vec (crack line) to make pieces fly away from each other; using crackSegmentVec rotated to PI/2
+    
+  // here is the trick: for new polygon, we take first cracking point, second cracking point and all the vertices that are between them, CCW. 
+  // For 2nd new polygon we do the same, but in backward direction
+  makeCrackedPoly(arr, crSp, 0, newArrs[0]);
+  makeCrackedPoly(arr, crSp, 1, newArrs[1]);
+
+  Asteroid newAsteroids[2] = {Asteroid(newID(), TEXTURE_ASTEROID, newArrs[0], 0),
+                              Asteroid(newID(), TEXTURE_ASTEROID, newArrs[1], 0)
+  // last parameter sets lives to 0 (default for new asteroids is 1), so cracked parts won't be parted again when hit
+  };
+  newAsteroids[0].SetPosition(asteroid.GetPosition());
+  newAsteroids[1].SetPosition(asteroid.GetPosition());
+
+  newAsteroids[0].SetSize(asteroid.GetSize());
+  newAsteroids[1].SetSize(asteroid.GetSize());
+
+  newAsteroids[0].SetSpeed(asteroid.GetSpeed() + orthoSpeed);
+  newAsteroids[1].SetSpeed(asteroid.GetSpeed() - orthoSpeed);
+
+  added.push_back(newAsteroids[0]);
+  added.push_back(newAsteroids[1]);
 }
 
 void Game::Update()
@@ -95,6 +133,9 @@ void Game::Update()
   {
     _timeLastUpdate = updateStartTime;
 
+    ObjectList newAsteroids; // for deferred adding of new asteroids (that are parts of cracked one)
+
+    // find objects that are not visible anymore & need to be actually removed from scene
     checkDestroyedObjects(GetAsteroids());
     checkDestroyedObjects(GetBullets());
         
@@ -107,23 +148,35 @@ void Game::Update()
     {
       asteroid.Update(elapsed);
 
-      if(!asteroid.IsDestroyed() && Collider::Collides(_heroObject, asteroid, Point(), Point())) //GOD MODE :D
-        _heroObject.Destroy();  
+      CrackSpots crSpUnused; // just for correct syntax, no need to get the crack line here
 
-      for (GameObject& bullet : _bullets)
+      if(!asteroid.IsDestroyed() && Collider::CollidesPoly(_heroObject, asteroid, crSpUnused))
+        _heroObject.Destroy();
+
+      for (GameObject& bullet : _bullets) //check if bullet hits asteroid
       {
-        Point coll1, coll2;
+        CrackSpots crSp;
         if(!asteroid.IsDestroyed() && 
            !bullet  .IsDestroyed() && 
-           Collider::Collides(bullet, asteroid, coll1, coll2))
+           Collider::CollidesPoly(bullet, asteroid, crSp))
         {
-          asteroid.Destroy();
-          bullet  .Destroy();
+          if (asteroid.GetLifes() > 0)
+          {
+            crackAsteroid(newAsteroids, asteroid, bullet, crSp);
+            asteroid.Destroy(true); // immediately remove 'parent'-asteroid from scene without any animation
+          }
+          else
+            asteroid.Destroy(); // this is already cracked asteroid, so just destroy it in usual way
+
+          bullet.Destroy();
         }
       }
     }
     while (_asteroids.size() < ASTEROIDS_MIN)
       addObject(Asteroid(newID(), TEXTURE_ASTEROID), GetAsteroids());
+
+    for (GameObject &obj : newAsteroids)
+      addObject(obj, GetAsteroids(), false); //last parameter is false here (default = true) 'cause we're reusing old Size that is already adapted for world aspect ratio
   }
 }
 

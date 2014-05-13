@@ -1,10 +1,10 @@
 #ifndef _GAME_H_
 #define _GAME_H_
 
-#include <map>
 #include <time.h>
-#include "GameObject.h"
 #include <list>
+
+#include "GameObject.h"
 
 typedef std::list<GameObject> ObjectList;
 
@@ -14,6 +14,7 @@ public:
   Game();
 
   void Update();
+
   void SetRatio(float r);
   void InitObjects();
 
@@ -34,7 +35,7 @@ public:
 protected:
 
   void addAsteroid();
-  void addObject(GameObject &as, ObjectList& objects);
+  void addObject(GameObject &as, ObjectList& objects, bool fixObjSize = true);
     
   // repair X of current point with current ratio
   void fixObjectXSize(GameObject &obj);
@@ -43,7 +44,7 @@ protected:
   IDType newID();
   
   void checkGameOver();
-
+  void crackAsteroid(ObjectList& added, GameObject& asteroid, GameObject& bullet, CrackSpots& crSp);
   ObjectList _asteroids, _bullets;
 
   IDType nextID = 0;

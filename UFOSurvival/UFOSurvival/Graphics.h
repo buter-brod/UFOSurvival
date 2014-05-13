@@ -5,7 +5,7 @@
 #include <glut.h>
 #include <map>
 #include <time.h>
-#include <vector>
+
 #include "Game.h"
 
 class Graphics
@@ -48,10 +48,7 @@ protected:
   };
 
   VBOData _vboData;
-  
-
   Game *_game;
-  
   clock_t _timeLastRedraw;
 };
 

@@ -17,16 +17,16 @@ int   rnd0xi(int   x) { return rnd()   % x; }
 
 float rndfMinMax(float min, float max) { return min + rnd01() * (max - min); }
 
-std::string Utils::ToString(unsigned int i)
+float dt(clock_t first, clock_t second)
+{
+  return (float(first) - float(second)) / CLOCKS_PER_SEC;
+}
+
+std::string ToString(unsigned int i)
 {
   std::stringstream ss;
   ss << i;
   return ss.str();
-}
-
-float dt(clock_t first, clock_t second)
-{
-  return (float(first) - float(second)) / CLOCKS_PER_SEC;
 }
 
 Point Point::operator/(float val)
@@ -66,10 +66,21 @@ void Point::operator-=(Point p)
   _y -= p.Y();
 }
 
+Point Point::operator-()
+{
+  return Point(-X(), -Y());
+}
+
 void Point::operator*=(Point p)
 {
   _x *= p.X();
   _y *= p.Y();
+}
+
+void Point::operator/=(Point p)
+{
+  _x /= p.X();
+  _y /= p.Y();
 }
 
 void Point::operator*=(float val)
@@ -80,6 +91,10 @@ void Point::operator*=(float val)
 
 Point Point::normalized()
 {
-  float inv_length = 1.0f / sqrt(_x *_x + _y *_y);
-  return (*this * inv_length);
+  return (*this * (1.0f / len()));
+}
+
+float Point::len()
+{
+  return sqrt(_x *_x + _y *_y);
 }

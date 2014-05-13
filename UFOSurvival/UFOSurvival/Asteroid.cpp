@@ -9,10 +9,13 @@ static const float ASTEROID_MAX_SPEED = 0.2f;
 static const float ASTEROID_MAX_SIZE  = 0.2f;
 static const float ASTEROID_MIN_SIZE  = 0.1f;
 
-Asteroid::Asteroid(IDType id, std::string tex)
-: GameObject(id, tex)
+Asteroid::Asteroid(IDType id, std::string tex, VArr& vertexArr, unsigned int lifes)
+: GameObject(id, tex, lifes)
 {
-  generatePoly();
+  if (vertexArr.empty())
+    generatePoly();
+  else
+    _vertArray = vertexArr;
 
   float sizef = rndfMinMax(ASTEROID_MIN_SIZE, ASTEROID_MAX_SIZE);
   Point size(sizef, sizef);

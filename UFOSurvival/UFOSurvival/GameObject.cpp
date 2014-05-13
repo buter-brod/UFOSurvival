@@ -3,8 +3,8 @@
 
 static const float DESTROY_TIME = 0.1f;
 
-GameObject::GameObject(IDType id, std::string texture)
-: _id(id), _texture(texture)
+GameObject::GameObject(IDType id, std::string texture, unsigned int lifes)
+: _id(id), _texture(texture), _lifes(lifes)
 {
 }
 
@@ -61,11 +61,14 @@ float GameObject::GetDestroyProgress() const
   return std::min<float>(1.f, _destroyedSAgo / DESTROY_TIME);
 }
 
-void GameObject::Destroy()
+void GameObject::Destroy(bool instant)
 {
   if (!_destroyed)
   {
-    _destroyedSAgo = 0.f;
     _destroyed = true;
-  }  
+    _destroyedSAgo = 0.f;
+  }
+
+  if(instant)
+    _destroyedSAgo = DESTROY_TIME;
 }

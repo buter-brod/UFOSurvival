@@ -12,13 +12,13 @@ typedef std::vector<Point> VArr;
 class GameObject
 {
 public:
-  GameObject(IDType id, std::string texture);
+  GameObject(IDType id, std::string texture, unsigned int lifes = 0);
   
   bool operator==(const GameObject& obj) const;
   bool operator!=(const GameObject& obj) const;
 
   void Update(float time);
-  void Destroy();
+  void Destroy(bool instant = false);
   
   float GetDestroyProgress() const;
   bool IsDestroyed() {return _destroyed;}
@@ -30,20 +30,24 @@ public:
   std::string GetTexture () const { return _texture;  }
   IDType      GetID      () const { return _id;       }
 
-  VArr& GetVArray() {return _vertArray;}
-
+  VArr        GetVArray  () const {return _vertArray; }
+  
   void SetPosition    (Point ps) { _position     =  ps; }
   void SetSize        (Point sz) { _size         =  sz; }
   void SetSpeed       (Point sp) { _speed        =  sp; }
   void SetAcceleration(Point ac) { _acceleration =  ac; }
 
   void SetMaxLifeTime (float tm) { _maxLifeTime = tm;   }
+
+  unsigned int GetLifes() {return _lifes;}
   
 protected:
   Point _size;
   Point _position;
   Point _speed;
   Point _acceleration;
+
+  unsigned int _lifes;
 
   std::string _texture;
   IDType _id;
