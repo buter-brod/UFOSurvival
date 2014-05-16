@@ -228,7 +228,7 @@ void Graphics::frame()
   }
 }
 
-void Graphics::Frame()
+bool Graphics::Frame()
 {
   clock_t frameStartTime = clock();
   if(dt(frameStartTime, _timeLastRedraw) >= DELAY)
@@ -236,5 +236,7 @@ void Graphics::Frame()
     _timeLastRedraw = frameStartTime;
 
     frame();
+    return true;
   }
+  return false;
 }

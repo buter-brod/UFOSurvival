@@ -55,7 +55,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)\lib\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\lib\include;$(SolutionDir)\..\src\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -84,13 +84,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\Asteroid.h" />
-    <ClInclude Include="..\..\src\Collider.h" />
-    <ClInclude Include="..\..\src\Game.h" />
-    <ClInclude Include="..\..\src\GameObject.h" />
-    <ClInclude Include="..\..\src\Graphics.h" />
-    <ClInclude Include="..\..\src\Log.h" />
-    <ClInclude Include="..\..\src\Utils.h" />
+    <ClInclude Include="..\..\src\include\Asteroid.h" />
+    <ClInclude Include="..\..\src\include\Collider.h" />
+    <ClInclude Include="..\..\src\include\Game.h" />
+    <ClInclude Include="..\..\src\include\GameObject.h" />
+    <ClInclude Include="..\..\src\include\Graphics.h" />
+    <ClInclude Include="..\..\src\include\Log.h" />
+    <ClInclude Include="..\..\src\include\Utils.h" />
     <ClInclude Include="loadTexture.h" />
   </ItemGroup>
   <ItemGroup>
@@ -100,8 +100,8 @@
     <ClCompile Include="..\..\src\GameObject.cpp" />
     <ClCompile Include="..\..\src\Graphics.cpp" />
     <ClCompile Include="..\..\src\Log.cpp" />
-    <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\Utils.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

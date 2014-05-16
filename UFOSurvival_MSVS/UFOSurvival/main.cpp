@@ -12,8 +12,8 @@ bool g_flying = false;
 
 void display()
 {
-  g_graphics.Frame();
-  glutSwapBuffers();
+  if (g_graphics.Frame())
+    glutSwapBuffers();
 }
 
 void idle()

@@ -13,7 +13,7 @@ class Graphics
 public:
 
   void LoadTexture(std::string texName);  
-  void Frame();
+  bool Frame();
   void Init(Game *game, Point size);
   void LoadVertex(IDType id, VArr &vVec);
 
