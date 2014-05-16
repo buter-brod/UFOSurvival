@@ -57,22 +57,21 @@ void Game::addObject(GameObject &obj, ObjectList& objects, bool fixObjSize)
 void Game::InitObjects()
 {
   {
-    _heroObject      .SetSize(HERO_SIZE);
     _gameOverObject  .SetSize(GAMEOVER_SIZE);
     _backgroundObject.SetSize(Point(_ratio, 1.0f));
     _blackObject     .SetSize(Point(_ratio, 1.0f));
     
     _backgroundObject.SetPosition(CENTER);
-    _heroObject      .SetPosition(CENTER);
     _gameOverObject  .SetPosition(CENTER);
     _blackObject     .SetPosition(CENTER);
   }
   {
     fixObjectXSize(_backgroundObject);
-    fixObjectXSize(_heroObject      );
     fixObjectXSize(_gameOverObject  );
     fixObjectXSize(_blackObject     );
   }
+
+  Restart();
 }
 
 void checkDestroyedObjects(ObjectList& objects)
@@ -203,4 +202,18 @@ void Game::EngineStop()
 IDType Game::newID()
 {
   return nextID++;
+}
+
+void Game::Restart(bool newHero)
+{
+  _asteroids.clear();
+  _bullets  .clear();
+
+  if (newHero)
+    _heroObject = GameObject(newID(), TEXTURE_HERO);
+  
+  _heroObject.SetPosition(CENTER);
+  _heroObject.SetSize    (HERO_SIZE);
+  
+  fixObjectXSize(_heroObject);
 }

@@ -26,7 +26,12 @@ void mouseClick(int button, int state, int x, int y)
 {
   Point pos(float(x) / SCREEN_W, 1.f - float(y) / SCREEN_H);
 
-  if(button == GLUT_RIGHT_BUTTON)
+  if (g_game.IsGameOver())
+  {
+    g_game.Restart(true);
+  }
+  
+  else if(button == GLUT_RIGHT_BUTTON)
   {
     if(state == GLUT_DOWN)
     {

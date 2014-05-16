@@ -17,6 +17,7 @@ public:
 
   void SetRatio(float r);
   void InitObjects();
+  void Restart(bool newHero = false);
 
   void EngineFly(Point pos);
   void EngineStop();
