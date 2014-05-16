@@ -1,8 +1,7 @@
 #ifndef _GRAPHICS_H_
 #define _GRAPHICS_H_
 
-#include <glew.h>
-#include <glut.h>
+#include "glHeaders.h"
 #include <map>
 #include <time.h>
 

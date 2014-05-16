@@ -91,6 +91,7 @@
     <ClInclude Include="..\..\src\include\Graphics.h" />
     <ClInclude Include="..\..\src\include\Log.h" />
     <ClInclude Include="..\..\src\include\Utils.h" />
+    <ClInclude Include="lib\include\glHeaders.h" />
     <ClInclude Include="loadTexture.h" />
   </ItemGroup>
   <ItemGroup>

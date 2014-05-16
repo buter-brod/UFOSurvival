@@ -23,7 +23,6 @@ static GLfloat uvs[4][2] =
 
 void Graphics::initGL()
 {
-  glewInit();
   glViewport(0, 0, _size.I_X(), _size.I_Y());
 
   GLfloat ratio = _size.X() / _size.Y();

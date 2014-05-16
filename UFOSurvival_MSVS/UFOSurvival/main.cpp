@@ -1,4 +1,3 @@
-#include <windows.h>  
 #include "Graphics.h"
 #include "Game.h"
 
@@ -30,6 +29,7 @@ void mouseClick(int button, int state, int x, int y)
   {
     g_game.Restart(true);
     g_graphics = Graphics();
+    glewInit();
     g_graphics.Init(&g_game, Point(SCREEN_W, SCREEN_H));
   }
   
@@ -74,6 +74,7 @@ int main(int argc, char** argv)
     
   g_game.SetRatio(SCREEN_W / SCREEN_H);
   g_game.InitObjects();
+  glewInit();
   g_graphics.Init(&g_game, Point(SCREEN_W, SCREEN_H));
   
   glutDisplayFunc(display);
