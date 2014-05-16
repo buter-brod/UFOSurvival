@@ -187,11 +187,11 @@ void Graphics::drawObject(GameObject& obj)
   }
   else
   {
-    if (!_vboData.initWithDefault)
+    if (!_vboData._initWithDefault)
     {// this object will be the first to use 'default' VBO (rectangle -1..1), we'll remember its ID as a reference for all future objects that have no their own vertex data
       _vboData._defaultVBOID = obj.GetID();
       loadVertex(vertices, 4*3, uvs, 4*2, _vboData._defaultVBOID);
-      _vboData.initWithDefault = true;
+      _vboData._initWithDefault = true;
     }
     else
       vboID = _vboData._defaultVBOID; // object has no its own vertex data, so let's use default VBO reference that was initialized by the same 'rectangle'-based object somewhen before
@@ -239,4 +239,33 @@ bool Graphics::Frame()
     return true;
   }
   return false;
+}
+
+void Graphics::delVBO(Graphics::VBO &vbo)
+{
+  glDeleteBuffers(1, &vbo._t);
+  glDeleteBuffers(1, &vbo._v);
+}
+
+void Graphics::cleanup()
+{  
+  for (auto vbo : _vboData._vboMap)
+    delVBO(vbo.second);
+
+  for (auto tex : _textureMap)
+    glDeleteTextures(1, &tex.second);
+
+  _vboData._vboMap.clear();
+  _textureMap     .clear();
+  _vboData._initWithDefault = false;
+}
+
+Graphics::~Graphics()
+{
+  {
+    glGetError();
+    if (glGetError() > 0) // after double call it's still an error, context is likely dead
+     return;
+  }
+  cleanup();
 }

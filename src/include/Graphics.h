@@ -16,9 +16,18 @@ public:
   bool Frame();
   void Init(Game *game, Point size);
   void LoadVertex(IDType id, VArr &vVec);
+  ~Graphics();
 
 protected:
-  
+
+  struct VBO
+  {
+    VBO(GLuint v = 0, GLuint t = 0): _v(v), _t(t) {}
+    GLuint _v, _t;
+  };
+
+  void delVBO(Graphics::VBO &vbo);
+  void cleanup();
   void initGL();
   void loadVertex(GLvoid *vvp, unsigned int vvSize, GLvoid *uvp, unsigned int uvSize, IDType id);
   void loadObjectData();
@@ -33,17 +42,11 @@ protected:
   Point _size;
   std::map<std::string, GLuint> _textureMap;
 
-  struct VBO
-  {
-    VBO(GLuint v = 0, GLuint t = 0) : _v(v), _t(t) {}
-    GLuint _v, _t;
-  };
-
   struct VBOData
   {
     std::map<IDType, VBO> _vboMap;
     IDType _defaultVBOID;
-    bool initWithDefault = false;
+    bool _initWithDefault = false;
   };
 
   VBOData _vboData;

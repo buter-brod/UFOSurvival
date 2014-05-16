@@ -29,6 +29,8 @@ void mouseClick(int button, int state, int x, int y)
   if (g_game.IsGameOver())
   {
     g_game.Restart(true);
+    g_graphics = Graphics();
+    g_graphics.Init(&g_game, Point(SCREEN_W, SCREEN_H));
   }
   
   else if(button == GLUT_RIGHT_BUTTON)
