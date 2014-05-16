@@ -96,7 +96,7 @@ void makeCrackedPoly(VArr inputVArr, CrackSpots crSp, unsigned int first, VArr &
 void Game::crackAsteroid(ObjectList& added, GameObject& asteroid, GameObject& bullet, CrackSpots& crSp)
 {
   VArr newArrs[2];
-  VArr& arr = asteroid.GetVArray();
+  const VArr& arr = asteroid.GetVArray();
 
   Point crackSegmentVec = crSp[0]._p - crSp[1]._p;
   Point orthoSpeed = Point(- crackSegmentVec.Y(), crackSegmentVec.X()).normalized() * asteroid.GetSpeed().len() / 2.f;

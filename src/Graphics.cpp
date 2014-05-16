@@ -70,7 +70,7 @@ void Graphics::loadObjectData()
   loadObjectData(_game->GetGameOverObject());
 }
 
-void Graphics::LoadVertex(IDType id, VArr &vVec)
+void Graphics::LoadVertex(IDType id, const VArr &vVec)
 {
   std::vector<float> vertexVecFlat, uvVecFlat;
 

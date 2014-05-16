@@ -6,7 +6,7 @@
 class Collider
 {
 public:
-  static bool CollidesPoly(GameObject &obj1, GameObject &poly, Collider::CrackSpots &crsp);
+  static bool CollidesPoly(GameObject &obj1, GameObject &poly, CrackSpots &crsp);
   
 protected:
   

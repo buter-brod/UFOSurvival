@@ -14,7 +14,7 @@ public:
   void LoadTexture(std::string texName);  
   bool Frame();
   void Init(Game *game, Point size);
-  void LoadVertex(IDType id, VArr &vVec);
+  void LoadVertex(IDType id, const VArr &vVec);
   ~Graphics();
 
 protected:

@@ -30,7 +30,7 @@ public:
   std::string GetTexture () const { return _texture;  }
   IDType      GetID      () const { return _id;       }
 
-  VArr        GetVArray  () const {return _vertArray; }
+  const VArr& GetVArray  () const {return _vertArray; }
   
   void SetPosition    (Point ps) { _position     =  ps; }
   void SetSize        (Point sz) { _size         =  sz; }
