@@ -11,5 +11,5 @@ Log::~Log()
 
 void Log::Print(std::string str)
 {
-  printf(str.c_str());
+  std::cout << str.c_str();
 }
