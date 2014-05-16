@@ -32,6 +32,7 @@ void Graphics::initGL()
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   glOrtho(-ratio, ratio, -1, 1, 1, 10);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -160,14 +161,14 @@ void Graphics::draw(GLuint tInd, GLuint vBuf, GLuint tBuf, unsigned int vCount, 
   glBindTexture(GL_TEXTURE_2D, tInd);
 
   glBindBuffer(GL_ARRAY_BUFFER, vBuf);
-  glEnableClientState(GL_VERTEX_ARRAY);
   glVertexPointer(3, GL_FLOAT, 0, 0);
 
   glBindBuffer(GL_ARRAY_BUFFER, tBuf);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glTexCoordPointer(2, GL_FLOAT, 0, 0);
 
   glDrawArrays(GL_TRIANGLE_FAN, 0, vCount);
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 Point Graphics::posToScreen(Point p)
@@ -226,31 +227,10 @@ void Graphics::drawObject(GameObject& obj)
   float opacity = 1.f - obj.GetDestroyProgress();
 
   draw(tex, vbo._v, vbo._t, vCount, posScreen, sizScreen, opacity);
-
-  /*{
-    float x = obj.GetPosition().X();
-    float y = obj.GetPosition().Y();
-
-    float xs2 = obj.GetSize().X() / 2.f;
-    float ys2 = obj.GetSize().Y() / 2.f;
-
-    if(x > 1.f - xs2)
-    draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x - 1.f, y)), sizScreen, opacity);
-
-    if(x < 0.f + xs2)
-    draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x + 1.f, y)), sizScreen, opacity);
-
-    if(y > 1.f - ys2)
-    draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x, y - 1.f)), sizScreen, opacity);
-
-    if(y < 0.f + ys2)
-    draw(tex, vbo._v, vbo._t, vCount, posToScreen(Point(x, y + 1.f)), sizScreen, opacity);
-    }*/
 }
 
 void Graphics::frame()
 {
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
   {
@@ -269,8 +249,6 @@ void Graphics::frame()
       drawObject(_game->GetGameOverObject());
     }
   }
-
-  glFlush();
 }
 
 void Graphics::Frame()

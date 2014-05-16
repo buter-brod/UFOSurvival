@@ -13,6 +13,7 @@ bool g_flying = false;
 void display()
 {
   g_graphics.Frame();
+  glutSwapBuffers();
 }
 
 void idle()
@@ -60,6 +61,7 @@ int main(int argc, char** argv)
 {
   glutInit(&argc, argv);
   glutInitWindowSize(int(SCREEN_W), int(SCREEN_H));
+  glutInitDisplayMode (GLUT_DOUBLE);
   glutInitWindowPosition(200, 200);
   glutCreateWindow("Cepkolap");
     
