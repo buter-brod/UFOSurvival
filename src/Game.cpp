@@ -1,27 +1,27 @@
 #include "Game.h"
 #include "Asteroid.h"
 
-static const float DELAY = 1.f / FPS;
+const float DELAY = 1.f / FPS;
 
-static const float ENGINE_POWER    = 0.5f;
-static const float BULLET_SPEED    = 0.5f;
-static const float BULLET_LIFETIME = 1.5f;
+const float ENGINE_POWER    = 0.5f;
+const float BULLET_SPEED    = 0.5f;
+const float BULLET_LIFETIME = 1.5f;
 
-static const unsigned int ASTEROIDS_MIN = 4;
+const unsigned int ASTEROIDS_MIN = 4;
 
-static const Point BULLET_SIZE   (0.02f,  0.02f);
-static const Point HERO_SIZE     (0.125f, 0.075f);
-static const Point GAMEOVER_SIZE (0.7f,   0.334f);
-static const Point CENTER        (0.5f,   0.5f);
+const Point BULLET_SIZE   (0.02f,  0.02f);
+const Point HERO_SIZE     (0.125f, 0.075f);
+const Point GAMEOVER_SIZE (0.7f,   0.334f);
+const Point CENTER        (0.5f,   0.5f);
 
-static const std::string TEXTURE_SKY       = "sky.png";
-static const std::string TEXTURE_PANEL     = "panel.png";
-static const std::string TEXTURE_HERO      = "spaceowl.png";
-static const std::string TEXTURE_GAMEOVER1 = "gameover1.png";
-static const std::string TEXTURE_GAMEOVER2 = "gameover2.png";
-static const std::string TEXTURE_BLACK     = "black.png";
-static const std::string TEXTURE_ASTEROID  = "asteroid.png";
-static const std::string TEXTURE_BULLET    = "bullet.png";
+const std::string TEXTURE_SKY       = "sky.png";
+const std::string TEXTURE_PANEL     = "panel.png";
+const std::string TEXTURE_HERO      = "spaceowl.png";
+const std::string TEXTURE_GAMEOVER1 = "gameover1.png";
+const std::string TEXTURE_GAMEOVER2 = "gameover2.png";
+const std::string TEXTURE_BLACK     = "black.png";
+const std::string TEXTURE_ASTEROID  = "asteroid.png";
+const std::string TEXTURE_BULLET    = "bullet.png";
 
 bool CollidesPoly(GameObject &obj1, GameObject &poly, CrackSpots &crsp);
 

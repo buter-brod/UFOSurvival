@@ -1,7 +1,7 @@
 #include "GameObject.h"
 #include <algorithm>
 
-static const float DESTROY_TIME = 0.1f;
+const float DESTROY_TIME = 0.1f;
 
 GameObject::GameObject(IDType id, std::string texture, unsigned int lifes)
 : _id(id), _texture(texture), _lifes(lifes), _destroyed(false), _destroyedSAgo(-1.f), _lifeTime(0.f), _maxLifeTime(-1.f)

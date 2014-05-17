@@ -1,13 +1,13 @@
 #include "Asteroid.h"
 #include <math.h>
 
-static const float PI   = 4.f * atan(1.f);
-static const float PI_2 = PI / 2.f;
+const float PI   = 4.f * atan(1.f);
+const float PI_2 = PI / 2.f;
 
-static const float ASTEROID_MIN_SPEED = 0.05f;
-static const float ASTEROID_MAX_SPEED = 0.2f;
-static const float ASTEROID_MAX_SIZE  = 0.2f;
-static const float ASTEROID_MIN_SIZE  = 0.1f;
+const float ASTEROID_MIN_SPEED = 0.05f;
+const float ASTEROID_MAX_SPEED = 0.2f;
+const float ASTEROID_MAX_SIZE  = 0.2f;
+const float ASTEROID_MIN_SIZE  = 0.1f;
 
 Asteroid::Asteroid(IDType id, std::string tex, VArr vertexArr, unsigned int lifes)
 : GameObject(id, tex, lifes)

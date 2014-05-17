@@ -9,7 +9,7 @@ Log::~Log()
 {
 }
 
-static void Print(const char* str, ...)
+void Print(const char* str, ...)
 {
   va_list argptr;
   va_start(argptr, str);

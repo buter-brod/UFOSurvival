@@ -2,7 +2,7 @@
 #include <sstream>
 #include <random>
 
-static const float RANDOM_STRENGTH = 5000.f;
+const float RANDOM_STRENGTH = 5000.f;
 
 unsigned int rnd()
 {

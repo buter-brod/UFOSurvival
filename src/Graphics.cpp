@@ -3,9 +3,9 @@
 #include "Log.h"
 #include "loadTexture.h"
 
-static float DELAY = 1.f / FPS;
+float DELAY = 1.f / FPS;
 
-static GLfloat vertices[4][3] =
+GLfloat vertices[4][3] =
 {
   {-1.f, -1.f, 0},
   { 1.f, -1.f, 0},
@@ -13,7 +13,7 @@ static GLfloat vertices[4][3] =
   {-1.f,  1.f, 0}
 };
 
-static GLfloat uvs[4][2] =
+GLfloat uvs[4][2] =
 {
   {0.f, 0.f},
   {1.f, 0.f},
