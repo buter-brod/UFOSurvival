@@ -1,6 +1,5 @@
 #include "Game.h"
 #include "Asteroid.h"
-#include "Collider.h"
 
 static const float DELAY = 1.f / FPS;
 
@@ -23,6 +22,8 @@ static const std::string TEXTURE_GAMEOVER2 = "gameover2.png";
 static const std::string TEXTURE_BLACK     = "black.png";
 static const std::string TEXTURE_ASTEROID  = "asteroid.png";
 static const std::string TEXTURE_BULLET    = "bullet.png";
+
+bool CollidesPoly(GameObject &obj1, GameObject &poly, CrackSpots &crsp);
 
 Game::Game()
 : _backgroundObject(newID(), TEXTURE_SKY),
@@ -155,7 +156,7 @@ void Game::Update()
 
       CrackSpots crSpUnused; // just for correct syntax, no need to get the crack line here
 
-      if(!asteroid.IsDestroyed() && Collider::CollidesPoly(_heroObject, asteroid, crSpUnused))
+      if(!asteroid.IsDestroyed() && CollidesPoly(_heroObject, asteroid, crSpUnused))
         _heroObject.Destroy();
 
       for (GameObject& bullet : _bullets) //check if bullet hits asteroid
@@ -163,7 +164,7 @@ void Game::Update()
         CrackSpots crSp;
         if(!asteroid.IsDestroyed() && 
            !bullet  .IsDestroyed() && 
-           Collider::CollidesPoly(bullet, asteroid, crSp))
+           CollidesPoly(bullet, asteroid, crSp))
         {
           if (asteroid.GetLifes() > 0)
           {

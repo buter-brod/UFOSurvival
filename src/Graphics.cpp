@@ -25,11 +25,9 @@ void Graphics::initGL()
 {
   glViewport(0, 0, _size.I_X(), _size.I_Y());
 
-  GLfloat ratio = _size.X() / _size.Y();
-
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glOrtho(-ratio, ratio, -1, 1, 1, 10);
+  glOrtho(-ratio(), ratio(), -1, 1, 1, 10);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
   glEnableClientState(GL_VERTEX_ARRAY);
@@ -62,12 +60,13 @@ void Graphics::loadObjectData(ObjectList& objects)
 void Graphics::loadObjectData()
 {
   loadObjectData(_game->GetAsteroids());
-  loadObjectData(_game->GetBullets());
+  loadObjectData(_game->GetBullets  ());
   
-  loadObjectData(_game->GetBlackObject());
+  loadObjectData(_game->GetBlackObject     ());
   loadObjectData(_game->GetBackgroundObject());
-  loadObjectData(_game->GetHeroObject());
-  loadObjectData(_game->GetGameOverObject());
+  loadObjectData(_game->GetHeroObject      ());
+  loadObjectData(_game->GetGameOverObject  ());
+  loadObjectData(_game->GetPanelObject     ());
 }
 
 void Graphics::LoadVertex(IDType id, const VArr &vVec)
@@ -150,14 +149,14 @@ void Graphics::draw(GLuint tInd, GLuint vBuf, GLuint tBuf, unsigned int vCount, 
 Point Graphics::posToScreen(Point p)
 {
   return Point(
-    (2.f * p.X() - 1.f) * (_size.X() / _size.Y()),
+    (2.f * p.X() - 1.f) * ratio(),
     (2.f * p.Y() - 1.f));
 }
 
 Point Graphics::sizeToScreen(Point p)
 {
   return Point(
-    p.X() * (_size.X() / _size.Y()),
+    p.X() * ratio(),
     p.Y());
 }
 
@@ -177,14 +176,14 @@ void Graphics::drawObject(GameObject& obj)
   if(_textureMap.count(obj.GetTexture()) < 1)
     LoadTexture(obj.GetTexture());
 
-  IDType vboID = obj.GetID();
+  IDType vboID = obj.GetID(); // by default, vbo index is unique and match object ID
 
-  if(vCount > 0)
+  if(vCount > 0) // n-gon
   {
     if(_vboData._vboMap.count(obj.GetID()) < 1)
       LoadVertex(obj.GetID(), obj.GetVArray()); // object looks like not pre-initialized, so let's load vertex data right now.
   }
-  else
+  else // no vertex data => it's just a simple rectangle
   {
     if (!_vboData._initWithDefault)
     {// this object will be the first to use 'default' VBO (rectangle -1..1), we'll remember its ID as a reference for all future objects that have no their own vertex data

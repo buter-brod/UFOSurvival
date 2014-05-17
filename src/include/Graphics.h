@@ -28,6 +28,7 @@ protected:
   void delVBO(Graphics::VBO &vbo);
   void cleanup();
   void initGL();
+  inline float ratio() {return _size.X() / _size.Y();}
   void loadVertex(GLvoid *vvp, unsigned int vvSize, GLvoid *uvp, unsigned int uvSize, IDType id);
   void loadObjectData();
   void loadObjectData(GameObject& obj);

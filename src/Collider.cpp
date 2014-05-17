@@ -1,7 +1,8 @@
-#include "Collider.h"
 #include <algorithm>
 
-bool Collider::isBBoxOverlapping(GameObject &obj1, GameObject &obj2)
+#include "GameObject.h"
+
+bool isBBoxOverlapping(GameObject &obj1, GameObject &obj2)
 {
   //non-scaled bbox of any GameObject is assumed as -1..1
 
@@ -18,7 +19,7 @@ bool Collider::isBBoxOverlapping(GameObject &obj1, GameObject &obj2)
           );
 }
 
-bool Collider::isWithinCircle(Point& p, GameObject &polygon)
+bool isWithinCircle(Point& p, GameObject &polygon)
 {
   return (pow(p.X() - polygon.GetPosition().X(), 2) / pow(polygon.GetSize().X(), 2)) +
          (pow(p.Y() - polygon.GetPosition().Y(), 2) / pow(polygon.GetSize().Y(), 2))
@@ -35,7 +36,7 @@ VArr getRealPolygon(GameObject &obj)
   return arr;
 }
 
-bool PointInPolygon(Point& point, VArr& poly)
+bool pointInPolygon(Point& point, VArr& poly)
 {
   bool c = false;
   unsigned int i, j;
@@ -102,8 +103,20 @@ unsigned int getCrosses(Point p, Point crossVec, GameObject& obj, VArr& realPoly
   }
   return crossCount;
 }
-bool Collider::CollidesPoly(GameObject &obj1, GameObject &poly, CrackSpots &crsp)
+
+bool CollidesPoly(GameObject &obj1, GameObject &poly, CrackSpots &crsp)
 {
+  /* obj1 is considered a 'bullet' here (rectangle), obj2 is an 'asteroid' (n-gon):
+     first, check whether their bboxes overlap (isBBoxOverlapping), no need to continue, if they're not;
+     then sequently take 4 vertices of rectangle (obj1) and check if any of them are within n-gon outcircle (outellipse actually, 'cause _size ratio may vary) 
+     (isWithinCircle). If point lies inside, then we check its placement (pointInPolygon) with ''all edges on the same side of the point''-algorithm.
+     After we've find out that point is inside the polygon, it's used as a center of a segment (obj1.Speed goes as direction for that) 
+     that will split obj2-polygon into two parts (getCrosses) by iterating all polygon edges, crossing them with that speed-oriented segment. 
+     Finally, only crosspoints (crsp) are returned, and no changes made to polygon here directly.
+
+     Special case is when non of rectangle points lies in polygon, but polygon vertex crosses one of rectangle' sides. Works just the same.
+  */
+
   if(!isBBoxOverlapping(obj1, poly))
     return false;
 
@@ -133,7 +146,7 @@ bool Collider::CollidesPoly(GameObject &obj1, GameObject &poly, CrackSpots &crsp
     if(!isWithinCircle(p, poly)) // check if point lies within the (-1..1) circle. This circle is the incircle for bbox and the outcircle for polygon.
       continue;
 
-    if(!PointInPolygon(p, realPolygon))
+    if(!pointInPolygon(p, realPolygon))
       continue;
 
     getCrosses(p, speedVecLong, poly, realPolygon, crsp);

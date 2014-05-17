@@ -85,7 +85,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\include\Asteroid.h" />
-    <ClInclude Include="..\..\src\include\Collider.h" />
     <ClInclude Include="..\..\src\include\Game.h" />
     <ClInclude Include="..\..\src\include\GameObject.h" />
     <ClInclude Include="..\..\src\include\Graphics.h" />
