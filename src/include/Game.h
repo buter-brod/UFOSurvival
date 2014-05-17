@@ -48,7 +48,7 @@ protected:
   void crackAsteroid(ObjectList& added, GameObject& asteroid, GameObject& bullet, CrackSpots& crSp);
   ObjectList _asteroids, _bullets;
 
-  IDType nextID = 0;
+  IDType _nextID;
   
   GameObject _heroObject, _backgroundObject, _gameOverObject, _blackObject;
   

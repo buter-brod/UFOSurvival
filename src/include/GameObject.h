@@ -51,11 +51,11 @@ protected:
 
   std::string _texture;
   IDType _id;
-  bool  _destroyed = false;
+  bool  _destroyed;
 
-  float _destroyedSAgo = -1.f;
-  float _lifeTime = 0.f;
-  float _maxLifeTime = -1.f;
+  float _destroyedSAgo;
+  float _lifeTime;
+  float _maxLifeTime;
   
   VArr _vertArray;
 };

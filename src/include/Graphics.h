@@ -43,9 +43,11 @@ protected:
 
   struct VBOData
   {
+    VBOData() :_initWithDefault(false) {}
+
     std::map<IDType, VBO> _vboMap;
     IDType _defaultVBOID;
-    bool _initWithDefault = false;
+    bool _initWithDefault;
   };
 
   VBOData _vboData;

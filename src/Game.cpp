@@ -27,7 +27,8 @@ Game::Game()
 : _backgroundObject(newID(), TEXTURE_SKY),
   _heroObject      (newID(), TEXTURE_HERO),
   _blackObject     (newID(), TEXTURE_BLACK),
-  _gameOverObject  (newID(), (rnd0xi(2) == 0) ? TEXTURE_GAMEOVER1 : TEXTURE_GAMEOVER2)
+  _gameOverObject  (newID(), (rnd0xi(2) == 0) ? TEXTURE_GAMEOVER1 : TEXTURE_GAMEOVER2),
+  _nextID(0)
 {
 }
 
@@ -172,7 +173,10 @@ void Game::Update()
       }
     }
     while (_asteroids.size() < ASTEROIDS_MIN)
-      addObject(Asteroid(newID(), TEXTURE_ASTEROID), GetAsteroids());
+    {
+      Asteroid newAsteroid(newID(), TEXTURE_ASTEROID);
+      addObject(newAsteroid, GetAsteroids());
+    }
 
     for (GameObject &obj : newAsteroids)
       addObject(obj, GetAsteroids(), false); //last parameter is false here (default = true) 'cause we're reusing old Size that is already adapted for world aspect ratio
@@ -201,7 +205,7 @@ void Game::EngineStop()
 
 IDType Game::newID()
 {
-  return nextID++;
+  return _nextID++;
 }
 
 void Game::Restart(bool newHero)

@@ -8,7 +8,7 @@ unsigned int rnd()
 {
   static std::default_random_engine rng(std::random_device{}());
   static std::uniform_real_distribution<float> dist(0, RANDOM_STRENGTH);
-  return unsigned int(dist(rng));
+  return (unsigned int) dist(rng);
 }
 
 float rnd01 ()        { return float(rnd()) / RANDOM_STRENGTH; }
@@ -19,7 +19,7 @@ float rndfMinMax(float min, float max) { return min + rnd01() * (max - min); }
 
 float dt(clock_t first, clock_t second)
 {
-  return (float(first) - float(second)) / CLOCKS_PER_SEC;
+  return std::abs(float(first) - float(second)) / CLOCKS_PER_SEC;
 }
 
 std::string ToString(unsigned int i)
