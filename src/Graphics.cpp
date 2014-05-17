@@ -218,6 +218,8 @@ void Graphics::frame()
 
       drawObjects(_game->GetAsteroids());
       drawObjects(_game->GetBullets());
+
+      drawObject(_game->GetPanelObject());
     }
     else
     {

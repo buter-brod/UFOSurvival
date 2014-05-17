@@ -30,6 +30,7 @@ public:
   GameObject& GetBackgroundObject() {return _backgroundObject;}
   GameObject& GetGameOverObject()   {return _gameOverObject;}
   GameObject& GetBlackObject()      {return _blackObject;}
+  GameObject& GetPanelObject()      {return _panelObject;}
   
   bool IsGameOver() {return _heroObject.GetDestroyProgress() >= 1.f;}
   
@@ -50,7 +51,7 @@ protected:
 
   IDType _nextID;
   
-  GameObject _heroObject, _backgroundObject, _gameOverObject, _blackObject;
+  GameObject _heroObject, _backgroundObject, _gameOverObject, _blackObject, _panelObject;
   
   float _ratio;
 

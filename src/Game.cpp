@@ -16,6 +16,7 @@ static const Point GAMEOVER_SIZE (0.7f,   0.334f);
 static const Point CENTER        (0.5f,   0.5f);
 
 static const std::string TEXTURE_SKY       = "sky.png";
+static const std::string TEXTURE_PANEL     = "panel.png";
 static const std::string TEXTURE_HERO      = "spaceowl.png";
 static const std::string TEXTURE_GAMEOVER1 = "gameover1.png";
 static const std::string TEXTURE_GAMEOVER2 = "gameover2.png";
@@ -27,6 +28,7 @@ Game::Game()
 : _backgroundObject(newID(), TEXTURE_SKY),
   _heroObject      (newID(), TEXTURE_HERO),
   _blackObject     (newID(), TEXTURE_BLACK),
+  _panelObject     (newID(), TEXTURE_PANEL),
   _gameOverObject  (newID(), (rnd0xi(2) == 0) ? TEXTURE_GAMEOVER1 : TEXTURE_GAMEOVER2),
   _nextID(0)
 {
@@ -61,15 +63,18 @@ void Game::InitObjects()
     _gameOverObject  .SetSize(GAMEOVER_SIZE);
     _backgroundObject.SetSize(Point(_ratio, 1.0f));
     _blackObject     .SetSize(Point(_ratio, 1.0f));
+    _panelObject     .SetSize(Point(_ratio, 1.0f));
     
     _backgroundObject.SetPosition(CENTER);
     _gameOverObject  .SetPosition(CENTER);
     _blackObject     .SetPosition(CENTER);
+    _panelObject     .SetPosition(CENTER);
   }
   {
     fixObjectXSize(_backgroundObject);
     fixObjectXSize(_gameOverObject  );
     fixObjectXSize(_blackObject     );
+    fixObjectXSize(_panelObject     );
   }
 
   Restart();

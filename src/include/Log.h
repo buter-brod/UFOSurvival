@@ -9,7 +9,8 @@ public:
   Log();
   ~Log();
 
-  static void Print(std::string str);
+  static void Print(std::string std, ...);
+  static void Print(const char* str, ...);
 };
 
 #endif
