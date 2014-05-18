@@ -9,9 +9,13 @@
 #include "log.h"
 
 #define SHOOT_BORDER 0.1f
+#define PAUSE_PIC_SIZE 0.175f
 
 Game     *g_game = 0;
 Graphics *g_graphics = 0;
+
+Point g_flyingToVec;
+bool g_flyingTo = false;
 
 bool g_restart = true;
 
@@ -73,25 +77,25 @@ static int engine_init_display(struct engine* engine)
   engine->height = h;
 
   glShadeModel(GL_SMOOTH);
-  glViewport(0, 0, engine->width, engine->height);
 
   return 0;
 }
 
 void restartGame(float w, float h)
 {
-  bool newHero = false;
-  if(g_graphics)
-  {
-    delete g_graphics;
-    newHero = true; // game was init previously
-  }
+//  if(g_graphics)
+//    delete g_graphics;
 
-  g_game->Restart(newHero);
-  g_graphics = new Graphics();
+// re-init of Graphics takes time on some old devices, let's reuse
+
+  if (!g_graphics)
+    g_graphics = new Graphics();
+
   g_game->SetRatio((GLfloat)w / h);
   g_game->InitObjects();
   g_graphics->Init(g_game, Point(w, h));
+
+  g_game->Start();
 
   g_restart = false;
 }
@@ -106,8 +110,11 @@ static void engine_draw_frame(struct engine* engine)
 
   if(g_restart)
     restartGame(engine->width, engine->height);
-  else
-    g_game->Update();
+
+  if (g_flyingTo)
+    g_game->EngineFly(g_flyingToVec);
+
+  g_game->Update();
 
   if(g_graphics->Frame())
     eglSwapBuffers(engine->display, engine->surface);
@@ -131,6 +138,18 @@ static void engine_term_display(struct engine* engine)
   engine->surface = EGL_NO_SURFACE;
 }
 
+void stopAcceleration()
+{
+    g_game->EngineStop();
+    g_flyingTo = false;
+}
+
+void doAcceleration(Point at)
+{
+	g_flyingToVec = at;
+	g_flyingTo = true;
+}
+
 static int32_t engine_handle_input(struct android_app* app, AInputEvent* event)
 {
   struct engine* engine = (struct engine*)app->userData;
@@ -141,8 +160,10 @@ static int32_t engine_handle_input(struct android_app* app, AInputEvent* event)
       if(AMotionEvent_getAction(event) == AMOTION_EVENT_ACTION_DOWN)
       {
         if(g_game->IsGameOver())
+        {
+          stopAcceleration();
           g_restart = true;
-
+        }
         else
         {
           float whereX =       AMotionEvent_getX(event, 0) / engine->width;
@@ -150,18 +171,28 @@ static int32_t engine_handle_input(struct android_app* app, AInputEvent* event)
 
           Point at(whereX, whereY);
 
-          if(whereX >       SHOOT_BORDER &&
-             whereX < 1.f - SHOOT_BORDER &&
-             whereY < 1.f - SHOOT_BORDER &&
-             whereY >       SHOOT_BORDER)
-
-            g_game->EngineFly(at);
+          if (whereX > 1.f - PAUSE_PIC_SIZE &&
+              whereY > 1.f - PAUSE_PIC_SIZE)
+          {
+        	  stopAcceleration();
+        	  g_game->Pause();
+          }
+          else if(whereX >       SHOOT_BORDER &&
+                  whereX < 1.f - SHOOT_BORDER &&
+                  whereY < 1.f - SHOOT_BORDER &&
+                  whereY >       SHOOT_BORDER)
+          {
+        	  doAcceleration(at);
+          }
           else
+          {
             g_game->Shoot(at);
+            stopAcceleration();
+          }
         }
       }
       else if(AMotionEvent_getAction(event) == AMOTION_EVENT_ACTION_UP)
-        g_game->EngineStop();
+        stopAcceleration();
     }
     return 1;
   }

@@ -17,7 +17,9 @@ public:
 
   void SetRatio(float r);
   void InitObjects();
-  void Restart(bool newHero = false);
+  void Start();
+  void Pause(bool pause);
+  void Pause(); // toggle
 
   void EngineFly(Point pos);
   void EngineStop();
@@ -54,6 +56,7 @@ protected:
   GameObject _heroObject, _backgroundObject, _gameOverObject, _blackObject, _panelObject;
   
   float _ratio;
+  bool _paused;
 
   clock_t _timeLastUpdate;
 };

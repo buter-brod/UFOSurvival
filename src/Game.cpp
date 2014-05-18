@@ -31,7 +31,8 @@ Game::Game()
   _blackObject     (newID(), TEXTURE_BLACK),
   _panelObject     (newID(), TEXTURE_PANEL),
   _gameOverObject  (newID(), (rnd0xi(2) == 0) ? TEXTURE_GAMEOVER1 : TEXTURE_GAMEOVER2),
-  _nextID(0)
+  _nextID(0), 
+  _paused(false)
 {
 }
 
@@ -78,7 +79,7 @@ void Game::InitObjects()
     fixObjectXSize(_panelObject     );
   }
 
-  Restart();
+  Start();
 }
 
 void checkDestroyedObjects(ObjectList& objects)
@@ -133,6 +134,9 @@ void Game::crackAsteroid(ObjectList& added, GameObject& asteroid, GameObject& bu
 
 void Game::Update()
 {
+  if (_paused)
+    return;
+
   clock_t updateStartTime = clock();
   float elapsed = dt(updateStartTime, _timeLastUpdate);
   if(elapsed >= DELAY && !IsGameOver())
@@ -214,16 +218,29 @@ IDType Game::newID()
   return _nextID++;
 }
 
-void Game::Restart(bool newHero)
+void Game::Start()
 {
   _asteroids.clear();
   _bullets  .clear();
 
-  if (newHero)
+  if (IsGameOver()) //restart
     _heroObject = GameObject(newID(), TEXTURE_HERO);
   
   _heroObject.SetPosition(CENTER);
   _heroObject.SetSize    (HERO_SIZE);
   
   fixObjectXSize(_heroObject);
+}
+
+void Game::Pause()
+{
+  Pause(!_paused);
+}
+
+void Game::Pause(bool pause)
+{
+  if (!pause)
+    _timeLastUpdate = clock();
+
+  _paused = pause;
 }

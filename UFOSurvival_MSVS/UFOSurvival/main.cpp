@@ -9,6 +9,8 @@ Graphics g_graphics;
 
 bool g_flying = false;
 
+#define SPACEBAR_KEY 32
+
 void display()
 {
   if (g_graphics.Frame())
@@ -27,7 +29,7 @@ void mouseClick(int button, int state, int x, int y)
 
   if (g_game.IsGameOver())
   {
-    g_game.Restart(true);
+    g_game.Start();
     g_graphics = Graphics();
     glewInit();
     g_graphics.Init(&g_game, Point(SCREEN_W, SCREEN_H));
@@ -64,6 +66,12 @@ void mouse(int x, int y)
   }
 }
 
+void keyDown(unsigned char key, int x, int y)
+{
+  if (key == SPACEBAR_KEY)
+    g_game.Pause();
+}
+
 int main(int argc, char** argv)
 {
   glutInit(&argc, argv);
@@ -81,6 +89,7 @@ int main(int argc, char** argv)
   glutIdleFunc(idle);
   glutMouseFunc(mouseClick);
   glutMotionFunc(mouse);
+  glutKeyboardFunc(keyDown);
 
   glutMainLoop();
 
