@@ -101,7 +101,7 @@ void makeCrackedPoly(VArr inputVArr, CrackSpots crSp, unsigned int first, VArr &
   arr.push_back(crSp[second]._p);
 }
 
-void Game::crackAsteroid(ObjectList& added, GameObject& asteroid, GameObject& bullet, CrackSpots& crSp)
+void Game::crackAsteroid(ObjectList& added, GameObject& asteroid, CrackSpots& crSp)
 {
   VArr newArrs[2];
   const VArr& arr = asteroid.GetVArray();
@@ -172,7 +172,7 @@ void Game::Update()
         {
           if (asteroid.GetLifes() > 0)
           {
-            crackAsteroid(newAsteroids, asteroid, bullet, crSp);
+            crackAsteroid(newAsteroids, asteroid, crSp);
             asteroid.Destroy(true); // immediately remove 'parent'-asteroid from scene without any animation
           }
           else

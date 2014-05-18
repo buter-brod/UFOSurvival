@@ -48,7 +48,7 @@ protected:
   IDType newID();
   
   void checkGameOver();
-  void crackAsteroid(ObjectList& added, GameObject& asteroid, GameObject& bullet, CrackSpots& crSp);
+  void crackAsteroid(ObjectList& added, GameObject& asteroid, CrackSpots& crSp);
   ObjectList _asteroids, _bullets;
 
   IDType _nextID;
