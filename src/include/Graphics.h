@@ -29,14 +29,28 @@ protected:
   void cleanup();
   void initGL();
   inline float ratio() {return _size.X() / _size.Y();}
-  void loadVertex(GLvoid *vvp, unsigned int vvSize, GLvoid *uvp, unsigned int uvSize, IDType id);
+  void loadVertex(GLvoid *vvp, size_t vvSize, GLvoid *uvp, size_t uvSize, IDType id);
   void loadObjectData();
-  void loadObjectData(GameObject& obj);
-  void loadObjectData(ObjectList& objects);
+  void loadTexture(const GameObjectPtr& obj);
+  void loadVertex (const AsteroidPtr  & ast);
+
+  template<typename ObjListType> void loadTextures(const ObjListType& objects)
+  {
+    for(const typename ObjListType::value_type &obj : objects)
+      loadTexture(obj);
+  }
+  
+  template<typename ObjListType> void drawObjects(const ObjListType& objects)
+  {
+    for(const typename ObjListType::value_type& obj : objects)
+      drawObject(obj);
+  }
+  
   void frame();
-  void drawObjects(ObjectList& objects);
-  void drawObject (GameObject& obj);
-  void draw(GLuint tInd, GLuint vBuf, GLuint tBuf, unsigned int fCount, Point pos, Point sz, float opacity);
+
+  void drawObject (const GameObjectPtr& obj, bool defaultRectangle = true, size_t vCount = 4);
+  void drawObject (const AsteroidPtr& ast);
+  void draw(GLuint tInd, GLuint vBuf, GLuint tBuf, size_t fCount, Point pos, Point sz, float opacity);
   Point posToScreen (Point p);
   Point sizeToScreen(Point p);
   Point _size;
@@ -52,7 +66,7 @@ protected:
   };
 
   VBOData _vboData;
-  Game *_game;
+  const Game *_game;
   clock_t _timeLastRedraw;
 };
 

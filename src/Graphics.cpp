@@ -43,30 +43,29 @@ void Graphics::initGL()
   glShadeModel(GL_SMOOTH);
 }
 
-void Graphics::loadObjectData(GameObject& obj)
+void Graphics::loadTexture(const GameObjectPtr &obj)
 {
-  LoadTexture(obj.GetTexture());
-
-  if(!obj.GetVArray().empty())
-    LoadVertex(obj.GetID(), obj.GetVArray());
+  LoadTexture(obj->GetTexture());
 }
 
-void Graphics::loadObjectData(ObjectList& objects)
+void Graphics::loadVertex(const AsteroidPtr& ast)
 {
-  for(GameObject& obj : objects)
-    loadObjectData(obj);
+  LoadVertex(ast->GetID(), ast->GetVArray());
 }
 
 void Graphics::loadObjectData()
 {
-  loadObjectData(_game->GetAsteroids());
-  loadObjectData(_game->GetBullets  ());
+  loadTextures(_game->GetAsteroids());
+  loadTextures(_game->GetBullets  ());
+
+  for (const AsteroidPtr &ast : _game->GetAsteroids())
+    loadVertex(ast);
   
-  loadObjectData(_game->GetBlackObject     ());
-  loadObjectData(_game->GetBackgroundObject());
-  loadObjectData(_game->GetHeroObject      ());
-  loadObjectData(_game->GetGameOverObject  ());
-  loadObjectData(_game->GetPanelObject     ());
+  loadTexture(_game->GetBlackObject     ());
+  loadTexture(_game->GetBackgroundObject());
+  loadTexture(_game->GetHeroObject      ());
+  loadTexture(_game->GetGameOverObject  ());
+  loadTexture(_game->GetPanelObject     ());
 }
 
 void Graphics::LoadVertex(IDType id, const VArr &vVec)
@@ -85,11 +84,11 @@ void Graphics::LoadVertex(IDType id, const VArr &vVec)
   loadVertex(vertexVecFlat.data(), vertexVecFlat.size(), uvVecFlat.data(), uvVecFlat.size(), id);
 }
 
-void Graphics::loadVertex(GLvoid *vvp, unsigned int vvSize, GLvoid *uvp, unsigned int uvSize, IDType id)
+void Graphics::loadVertex(GLvoid *vvp, size_t vvSize, GLvoid *uvp, size_t uvSize, IDType id)
 {
   if(_vboData._vboMap.count(id) > 0)
   {
-    Log::Print("VBO " + ToString(id) + " already exists with ids=" + ToString(_vboData._vboMap[id]._t) + "," + ToString(_vboData._vboMap[id]._v));
+    Log::Print("VBO " + ToString(id) + " already exists with ids=" + ToString((size_t)_vboData._vboMap[id]._t) + "," + ToString((size_t)_vboData._vboMap[id]._v));
     return;
   }
 
@@ -118,12 +117,12 @@ void Graphics::Init(Game *game, Point size)
 void Graphics::LoadTexture(std::string texName)
 {
   if(_textureMap.count(texName) == 0)
-    _textureMap[texName] = loadTexture(texName);
+    _textureMap[texName] = platform::loadTexture(texName);
   else
-    Log::Print("Texture " + texName + " already exists with id=" + ToString(_textureMap[texName]));
+    Log::Print("Texture " + texName + " already exists with id=" + ToString((size_t)_textureMap[texName]));
 }
 
-void Graphics::draw(GLuint tInd, GLuint vBuf, GLuint tBuf, unsigned int vCount, Point pos, Point size, float opacity)
+void Graphics::draw(GLuint tInd, GLuint vBuf, GLuint tBuf, size_t vCount, Point pos, Point size, float opacity)
 {
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
@@ -141,7 +140,7 @@ void Graphics::draw(GLuint tInd, GLuint vBuf, GLuint tBuf, unsigned int vCount, 
   glBindBuffer(GL_ARRAY_BUFFER, tBuf);
   glTexCoordPointer(2, GL_FLOAT, 0, 0);
 
-  glDrawArrays(GL_TRIANGLE_FAN, 0, vCount);
+  glDrawArrays(GL_TRIANGLE_FAN, 0, (GLsizei)vCount);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -160,54 +159,45 @@ Point Graphics::sizeToScreen(Point p)
     p.Y());
 }
 
-void Graphics::drawObjects(ObjectList& objects)
+void Graphics::drawObject(const AsteroidPtr& ast)
 {
-  for (GameObject& obj : objects)
-    drawObject(obj);
+  if(_vboData._vboMap.count(ast->GetID()) < 1)
+      LoadVertex(ast->GetID(), ast->GetVArray()); // object looks like not pre-initialized, so let's load vertex data right now.  
+
+  drawObject(ast, false, ast->GetVArray().size());
 }
 
-void Graphics::drawObject(GameObject& obj)
+void Graphics::drawObject(const GameObjectPtr& obj, bool defaultRectangle, size_t vCount)
 {
-  Point posScreen =  posToScreen(obj.GetPosition());
-  Point sizScreen = sizeToScreen(obj.GetSize());
+  Point posScreen =  posToScreen(obj->GetPosition());
+  Point sizScreen = sizeToScreen(obj->GetSize());
 
-  unsigned int vCount = obj.GetVArray().size();
+  if(_textureMap.count(obj->GetTexture()) < 1)
+    LoadTexture(obj->GetTexture());
 
-  if(_textureMap.count(obj.GetTexture()) < 1)
-    LoadTexture(obj.GetTexture());
+  IDType vboID = obj->GetID(); // by default, vbo index is unique and match object ID
 
-  IDType vboID = obj.GetID(); // by default, vbo index is unique and match object ID
-
-  if(vCount > 0) // n-gon
-  {
-    if(_vboData._vboMap.count(obj.GetID()) < 1)
-      LoadVertex(obj.GetID(), obj.GetVArray()); // object looks like not pre-initialized, so let's load vertex data right now.
-  }
-  else // no vertex data => it's just a simple rectangle
+  if (defaultRectangle)
   {
     if (!_vboData._initWithDefault)
     {// this object will be the first to use 'default' VBO (rectangle -1..1), we'll remember its ID as a reference for all future objects that have no their own vertex data
-      _vboData._defaultVBOID = obj.GetID();
+      _vboData._defaultVBOID = obj->GetID();
       loadVertex(vertices, 4*3, uvs, 4*2, _vboData._defaultVBOID);
       _vboData._initWithDefault = true;
     }
     else
       vboID = _vboData._defaultVBOID; // object has no its own vertex data, so let's use default VBO reference that was initialized by the same 'rectangle'-based object somewhen before
-
-    vCount = 4;
   }
 
-  GLuint tex = _textureMap[obj.GetTexture()];
+  GLuint tex = _textureMap[obj->GetTexture()];
   VBO vbo = _vboData._vboMap[vboID];
-  float opacity = 1.f - obj.GetDestroyProgress();
 
-  draw(tex, vbo._v, vbo._t, vCount, posScreen, sizScreen, opacity);
+  draw(tex, vbo._v, vbo._t, vCount, posScreen, sizScreen, obj->GetOpacity());
 }
 
 void Graphics::frame()
 {
   glClear(GL_COLOR_BUFFER_BIT);
-
   {
     drawObject(_game->GetBackgroundObject());
 

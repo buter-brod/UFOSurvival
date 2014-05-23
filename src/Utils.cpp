@@ -4,11 +4,11 @@
 
 const float RANDOM_STRENGTH = 5000.f;
 
-unsigned int rnd()
+size_t rnd()
 {
   static std::default_random_engine rng(std::random_device{}());
   static std::uniform_real_distribution<float> dist(0, RANDOM_STRENGTH);
-  return (unsigned int) dist(rng);
+  return (size_t) dist(rng);
 }
 
 float rnd01 ()        { return float(rnd()) / RANDOM_STRENGTH; }
@@ -22,7 +22,7 @@ float dt(clock_t first, clock_t second)
   return std::abs(float(first) - float(second)) / CLOCKS_PER_SEC;
 }
 
-std::string ToString(unsigned int i)
+std::string ToString(size_t i)
 {
   std::stringstream ss;
   ss << i;

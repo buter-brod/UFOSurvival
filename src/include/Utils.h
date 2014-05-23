@@ -56,12 +56,12 @@ protected:
 struct CrackSpot
 {
   CrackSpot(){}
-  CrackSpot(Point &p, unsigned int &i): _p(p), _i(i) {}
+  CrackSpot(Point &p, size_t &i): _p(p), _i(i) {}
   Point _p;
-  unsigned int _i; // index of last polygon vertex CCW
+  size_t _i; // index of last polygon vertex CCW
 };
 typedef CrackSpot CrackSpots[2];
 
-std::string ToString(unsigned int i);
+std::string ToString(size_t i);
 
 #endif

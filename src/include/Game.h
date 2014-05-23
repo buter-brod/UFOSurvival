@@ -2,11 +2,9 @@
 #define _GAME_H_
 
 #include <time.h>
-#include <list>
 
-#include "GameObject.h"
-
-typedef std::list<GameObject> ObjectList;
+#include "Asteroid.h"
+#include "Bullet.h"
 
 class Game
 {
@@ -25,35 +23,43 @@ public:
   void EngineStop();
   void Shoot(Point at);
 
-  ObjectList& GetAsteroids() {return _asteroids;}
-  ObjectList& GetBullets()   {return _bullets;}
+  const AsteroidList& GetAsteroids() const {return _asteroids;}
+  const BulletList  & GetBullets  () const {return _bullets  ;}
 
-  GameObject& GetHeroObject()       {return _heroObject;}
-  GameObject& GetBackgroundObject() {return _backgroundObject;}
-  GameObject& GetGameOverObject()   {return _gameOverObject;}
-  GameObject& GetBlackObject()      {return _blackObject;}
-  GameObject& GetPanelObject()      {return _panelObject;}
+  const MovingObjectPtr GetHeroObject      () const { return _heroObject      ;}
+  const GameObjectPtr   GetBackgroundObject() const { return _backgroundObject;}
+  const GameObjectPtr   GetGameOverObject  () const { return _gameOverObject  ;}
+  const GameObjectPtr   GetBlackObject     () const { return _blackObject     ;}
+  const GameObjectPtr   GetPanelObject     () const { return _panelObject     ;}
   
-  bool IsGameOver() {return _heroObject.GetDestroyProgress() >= 1.f;}
+  bool IsGameOver() const {return _heroObject->GetDestroyProgress() >= 1.f;}
   
 protected:
 
   void addAsteroid();
-  void addObject(GameObject &as, ObjectList& objects, bool fixObjSize = true);
-    
+  template<typename ObjListType> void addObject(typename ObjListType::value_type objPtr, ObjListType& objects, bool fixObjSize = true)
+  {
+    if(fixObjSize)
+      fixObjectXSize(objPtr);
+
+    objects.push_back(objPtr);
+  }
+
   // repair X of current point with current ratio
-  void fixObjectXSize(GameObject &obj);
-  Point scpt(Point p);
+  void fixObjectXSize(GameObjectPtr obj) const;
+  Point scpt(Point p) const;
 
   IDType newID();
   
-  void checkGameOver();
-  void crackAsteroid(ObjectList& added, GameObject& asteroid, CrackSpots& crSp);
-  ObjectList _asteroids, _bullets;
+  void crackAsteroid(AsteroidList& added, const AsteroidPtr& asteroid, CrackSpots& crSp);
+
+  AsteroidList _asteroids;
+  BulletList _bullets;
 
   IDType _nextID;
   
-  GameObject _heroObject, _backgroundObject, _gameOverObject, _blackObject, _panelObject;
+  MovingObjectPtr _heroObject;
+  GameObjectPtr _backgroundObject, _gameOverObject, _blackObject, _panelObject;
   
   float _ratio;
   bool _paused;

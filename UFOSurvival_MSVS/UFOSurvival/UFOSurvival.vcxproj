@@ -85,20 +85,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\include\Asteroid.h" />
+    <ClInclude Include="..\..\src\include\Bullet.h" />
     <ClInclude Include="..\..\src\include\Game.h" />
     <ClInclude Include="..\..\src\include\GameObject.h" />
     <ClInclude Include="..\..\src\include\Graphics.h" />
     <ClInclude Include="..\..\src\include\Log.h" />
+    <ClInclude Include="..\..\src\include\MovingObject.h" />
     <ClInclude Include="..\..\src\include\Utils.h" />
     <ClInclude Include="glHeaders.h" />
     <ClInclude Include="loadTexture.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Asteroid.cpp" />
+    <ClCompile Include="..\..\src\Bullet.cpp" />
     <ClCompile Include="..\..\src\Collider.cpp" />
     <ClCompile Include="..\..\src\Game.cpp" />
     <ClCompile Include="..\..\src\GameObject.cpp" />
     <ClCompile Include="..\..\src\Graphics.cpp" />
+    <ClCompile Include="..\..\src\MovingObject.cpp" />
     <ClCompile Include="..\..\src\Utils.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="main.cpp" />

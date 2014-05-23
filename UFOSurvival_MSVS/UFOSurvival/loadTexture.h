@@ -3,25 +3,27 @@
 
 #include <FreeImage.h>
 
-GLuint loadTexture(std::string texName)
+namespace platform
 {
-  GLuint texInd = -1;
-  FIBITMAP* bitmap = FreeImage_Load(FreeImage_GetFileType(texName.c_str(), 0), texName.c_str());
+  GLuint loadTexture(const std::string& texName)
+  {
+    GLuint texInd = -1;
+    FIBITMAP* bitmap = FreeImage_Load(FreeImage_GetFileType(texName.c_str(), 0), texName.c_str());
 
-  unsigned int w = FreeImage_GetWidth(bitmap);
-  unsigned int h = FreeImage_GetHeight(bitmap);
+    GLsizei w = (GLsizei)FreeImage_GetWidth(bitmap);
+    GLsizei h = (GLsizei)FreeImage_GetHeight(bitmap);
 
-  glGenTextures(1, &texInd);
+    glGenTextures(1, &texInd);
 
-  glBindTexture(GL_TEXTURE_2D, texInd);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, texInd);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h,
-    0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, (void*)FreeImage_GetBits(bitmap));
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h,
+      0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, (void*)FreeImage_GetBits(bitmap));
 
-  FreeImage_Unload(bitmap);
-  return texInd;
+    FreeImage_Unload(bitmap);
+    return texInd;
+  }
 }
-
 #endif

@@ -1,5 +1,5 @@
 #include "Asteroid.h"
-#include <math.h>
+#include <cmath>
 
 const float PI   = 4.f * atan(1.f);
 const float PI_2 = PI / 2.f;
@@ -9,14 +9,9 @@ const float ASTEROID_MAX_SPEED = 0.2f;
 const float ASTEROID_MAX_SIZE  = 0.2f;
 const float ASTEROID_MIN_SIZE  = 0.1f;
 
-Asteroid::Asteroid(IDType id, std::string tex, VArr vertexArr, unsigned int lifes)
-: GameObject(id, tex, lifes)
+Asteroid::Asteroid(IDType id, std::string tex, size_t lifes)
+: MovingObject(id, tex), _lifes(lifes)
 {
-  if (vertexArr.empty())
-    generatePoly();
-  else
-    _vertArray = vertexArr;
-
   float sizef = rndfMinMax(ASTEROID_MIN_SIZE, ASTEROID_MAX_SIZE);
   Point size(sizef, sizef);
   Point halfSize = size / 2.f;
@@ -69,4 +64,12 @@ void Asteroid::generatePoly()
 
     curAngle += rnd01() * PI_2;
   }
+}
+
+const VArr& Asteroid::GetVArray()
+{
+  if(_vertArray.empty())
+    generatePoly();
+
+  return _vertArray;
 }

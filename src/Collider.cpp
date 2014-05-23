@@ -1,16 +1,16 @@
+#include "Asteroid.h"
+
 #include <algorithm>
 
-#include "GameObject.h"
-
-bool isBBoxOverlapping(GameObject &obj1, GameObject &obj2)
+bool isBBoxOverlapping(GameObjectPtr obj1, GameObjectPtr obj2)
 {
   //non-scaled bbox of any GameObject is assumed as -1..1
 
-  Point obj1LB = obj1.GetPosition() - obj1.GetSize() / 2.f;
-  Point obj1RT = obj1.GetPosition() + obj1.GetSize() / 2.f;
+  Point obj1LB = obj1->GetPosition() - obj1->GetSize() / 2.f;
+  Point obj1RT = obj1->GetPosition() + obj1->GetSize() / 2.f;
 
-  Point obj2LB = obj2.GetPosition() - obj2.GetSize() / 2.f;
-  Point obj2RT = obj2.GetPosition() + obj2.GetSize() / 2.f;
+  Point obj2LB = obj2->GetPosition() - obj2->GetSize() / 2.f;
+  Point obj2RT = obj2->GetPosition() + obj2->GetSize() / 2.f;
 
   return !( obj1RT.X() < obj2LB.X() || 
             obj1LB.X() > obj2RT.X() ||
@@ -19,19 +19,19 @@ bool isBBoxOverlapping(GameObject &obj1, GameObject &obj2)
           );
 }
 
-bool isWithinCircle(Point& p, GameObject &polygon)
+bool isWithinCircle(Point& p, AsteroidPtr &polygon)
 {
-  return (pow(p.X() - polygon.GetPosition().X(), 2) / pow(polygon.GetSize().X(), 2)) +
-         (pow(p.Y() - polygon.GetPosition().Y(), 2) / pow(polygon.GetSize().Y(), 2))
+  return (pow(p.X() - polygon->GetPosition().X(), 2) / pow(polygon->GetSize().X(), 2)) +
+         (pow(p.Y() - polygon->GetPosition().Y(), 2) / pow(polygon->GetSize().Y(), 2))
 
          <= 1.f;
 }
 
-VArr getRealPolygon(GameObject &obj)
+VArr getRealPolygon(AsteroidPtr &polygon)
 {
   VArr arr;
-  for(Point pt : obj.GetVArray())
-    arr.push_back(obj.GetPosition() + pt * obj.GetSize() / 2.f);
+  for(Point pt : polygon->GetVArray())
+    arr.push_back(polygon->GetPosition() + pt * polygon->GetSize() / 2.f);
 
   return arr;
 }
@@ -39,9 +39,8 @@ VArr getRealPolygon(GameObject &obj)
 bool pointInPolygon(Point& point, VArr& poly)
 {
   bool c = false;
-  unsigned int i, j;
  
-  for(i = 0, j = poly.size() - 1; i < poly.size(); j = i++) 
+  for(size_t i = 0, j = poly.size() - 1; i < poly.size(); j = i++) 
   {
     if(
       ((poly[i].Y() >= point.Y()) != (poly[j].Y() >= point.Y())) &&
@@ -83,19 +82,19 @@ bool crossLine(Segment seg1, Segment seg2, Point& cross)
      (seg2._end  .X() <= cross.X() && seg2._begin.X() >= cross.X()));
 }
 
-unsigned int getCrosses(Point p, Point crossVec, GameObject& obj, VArr& realPolygon, CrackSpots& crsp)
+size_t getCrosses(Point p, Point crossVec, AsteroidPtr& obj, VArr& realPolygon, CrackSpots& crsp)
 {
-  unsigned int crossCount = 0;
+  size_t crossCount = 0;
 
-  for(unsigned int bInd = 0; bInd < realPolygon.size(); bInd++)
+  for(size_t bInd = 0; bInd < realPolygon.size(); bInd++)
   {
-    unsigned int eInd = (bInd + 1) % realPolygon.size();
+    size_t eInd = (bInd + 1) % realPolygon.size();
     Point cross;
 
     if(crossLine(Segment(p + crossVec, p - crossVec), Segment(realPolygon[bInd], realPolygon[eInd]), cross))
     {
-      cross -= obj.GetPosition();
-      cross /= obj.GetSize() / 2.f; // back transformation to relative-to-polygon coordinates
+      cross -= obj->GetPosition();
+      cross /= obj->GetSize() / 2.f; // back transformation to relative-to-polygon coordinates
 
       crsp[crossCount] = CrackSpot(cross, bInd);
       crossCount++;
@@ -104,7 +103,7 @@ unsigned int getCrosses(Point p, Point crossVec, GameObject& obj, VArr& realPoly
   return crossCount;
 }
 
-bool CollidesPoly(GameObject &obj1, GameObject &poly, CrackSpots &crsp)
+bool CollidesPoly(MovingObjectPtr obj1, AsteroidPtr &poly, CrackSpots &crsp)
 {
   /* obj1 is considered a 'bullet' here (rectangle), obj2 is an 'asteroid' (n-gon):
      first, check whether their bboxes overlap (isBBoxOverlapping), no need to continue, if they're not;
@@ -122,10 +121,10 @@ bool CollidesPoly(GameObject &obj1, GameObject &poly, CrackSpots &crsp)
 
   VArr realPolygon = getRealPolygon(poly); // transform all poly vertices to world-coordinates
 
-  float posX = obj1.GetPosition().X();
-  float posY = obj1.GetPosition().Y();
-  float hszX = obj1.GetSize().X() / 2.f;
-  float hszY = obj1.GetSize().Y() / 2.f;
+  float posX = obj1->GetPosition().X();
+  float posY = obj1->GetPosition().Y();
+  float hszX = obj1->GetSize().X() / 2.f;
+  float hszY = obj1->GetSize().Y() / 2.f;
 
   enum {LB, LT, RT, RB};
 
@@ -135,12 +134,12 @@ bool CollidesPoly(GameObject &obj1, GameObject &poly, CrackSpots &crsp)
                  Point(posX + hszX, posY - hszY)}; //RB
 
   //using speed vector as direction of the future 'crack'. if out object is not moving, using inverted poly speed instead
-  Point speedVec = obj1.GetSpeed().len() > 0.f ? 
-       obj1.GetSpeed(): 
-     - poly.GetSpeed();
+  Point speedVec = obj1->GetSpeed().len() > 0.f ? 
+       obj1->GetSpeed(): 
+     - poly->GetSpeed();
 
-  Point speedVecLong = speedVec.normalized() * std::max<float>(poly.GetSize().X(), 
-                                                               poly.GetSize().Y()); // make our cross-segment long enough to cover whole polygon
+  Point speedVecLong = speedVec.normalized() * std::max<float>(poly->GetSize().X(), 
+                                                               poly->GetSize().Y()); // make our cross-segment long enough to cover whole polygon
   for(Point p : points)
   {
     if(!isWithinCircle(p, poly)) // check if point lies within the (-1..1) circle. This circle is the incircle for bbox and the outcircle for polygon.
@@ -161,11 +160,11 @@ bool CollidesPoly(GameObject &obj1, GameObject &poly, CrackSpots &crsp)
         p.Y() > points[LB].Y() &&
         p.Y() < points[LT].Y())
 
-      for(unsigned int side = 0; side < points.size(); side++)
+      for(size_t side = 0; side < points.size(); side++)
       {
-        unsigned int nextV = (side + 1) % points.size();
+        size_t nextV = (side + 1u) % points.size();
         Point cross;
-        if(crossLine(Segment(p, poly.GetPosition()), Segment(points[side], points[nextV]), cross))
+        if(crossLine(Segment(p, poly->GetPosition()), Segment(points[side], points[nextV]), cross))
         {
           getCrosses(cross, speedVecLong, poly, realPolygon, crsp);
           return true;

@@ -104,41 +104,44 @@ uint8_t* loadPngImage(std::string path, unsigned int &width, unsigned int &heigh
   return lImageBuffer;
 }
 
-GLuint loadTexture(std::string path)
+namespace platform
 {
-  unsigned int width;
-  unsigned int height;
-  GLint format;
-
-  uint8_t* lImageBuffer = loadPngImage(path, width, height, format);
-  if(lImageBuffer == NULL)
-    return false;
-
-  GLuint texId;
-  GLenum lErrorResult;
-  glGenTextures(1, &texId);
-  glBindTexture(GL_TEXTURE_2D, texId);
-
-  // Set-up texture properties.
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-    GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-    GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-    GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-    GL_CLAMP_TO_EDGE);
-
-  // Loads image data into OpenGL.
-  glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0,
-    format, GL_UNSIGNED_BYTE, lImageBuffer);
-  delete[] lImageBuffer;
-  if(glGetError() != GL_NO_ERROR)
+  GLuint loadTexture(std::string path)
   {
-    glDeleteTextures(1, &texId);
-    return 0;
+    unsigned int width;
+    unsigned int height;
+    GLint format;
+
+    uint8_t* lImageBuffer = loadPngImage(path, width, height, format);
+    if(lImageBuffer == NULL)
+      return false;
+
+    GLuint texId;
+    GLenum lErrorResult;
+    glGenTextures(1, &texId);
+    glBindTexture(GL_TEXTURE_2D, texId);
+
+    // Set-up texture properties.
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+      GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+      GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+      GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+      GL_CLAMP_TO_EDGE);
+
+    // Loads image data into OpenGL.
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0,
+      format, GL_UNSIGNED_BYTE, lImageBuffer);
+    delete[] lImageBuffer;
+    if(glGetError() != GL_NO_ERROR)
+    {
+      glDeleteTextures(1, &texId);
+      return 0;
+    }
+    return texId;
   }
-  return texId;
 }
 
 #endif /* LOADTEXTURE_H_ */

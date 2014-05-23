@@ -105,6 +105,21 @@
 			<locationURI>PARENT-1-PROJECT_LOC/src/Asteroid.cpp</locationURI>
 		</link>
 		<link>
+			<name>jni/Asteroid.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/src/include/Asteroid.h</locationURI>
+		</link>
+		<link>
+			<name>jni/Bullet.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/src/Bullet.cpp</locationURI>
+		</link>
+		<link>
+			<name>jni/Bullet.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/src/include/Bullet.h</locationURI>
+		</link>
+		<link>
 			<name>jni/Collider.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/src/Collider.cpp</locationURI>
@@ -115,9 +130,19 @@
 			<locationURI>PARENT-1-PROJECT_LOC/src/Game.cpp</locationURI>
 		</link>
 		<link>
+			<name>jni/Game.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/src/include/Game.h</locationURI>
+		</link>
+		<link>
 			<name>jni/GameObject.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/src/GameObject.cpp</locationURI>
+		</link>
+		<link>
+			<name>jni/GameObject.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/src/include/GameObject.h</locationURI>
 		</link>
 		<link>
 			<name>jni/Graphics.cpp</name>
@@ -125,14 +150,34 @@
 			<locationURI>PARENT-1-PROJECT_LOC/src/Graphics.cpp</locationURI>
 		</link>
 		<link>
+			<name>jni/Graphics.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/src/include/Graphics.h</locationURI>
+		</link>
+		<link>
 			<name>jni/Log.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/src/include/Log.h</locationURI>
 		</link>
 		<link>
+			<name>jni/MovingObject.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/src/MovingObject.cpp</locationURI>
+		</link>
+		<link>
+			<name>jni/MovingObject.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/src/include/MovingObject.h</locationURI>
+		</link>
+		<link>
 			<name>jni/Utils.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/src/Utils.cpp</locationURI>
+		</link>
+		<link>
+			<name>jni/Utils.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/src/include/Utils.h</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

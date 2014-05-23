@@ -13,7 +13,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE    := ufo-survival
-LOCAL_SRC_FILES := main.cpp log.cpp ../../src/Asteroid.cpp ../../src/Collider.cpp ../../src/Game.cpp ../../src/GameObject.cpp ../../src/Graphics.cpp ../../src/Utils.cpp
+LOCAL_SRC_FILES := main.cpp log.cpp ../../src/MovingObject.cpp ../../src/Bullet.cpp ../../src/Asteroid.cpp ../../src/Collider.cpp ../../src/Game.cpp ../../src/GameObject.cpp ../../src/Graphics.cpp ../../src/Utils.cpp
 LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv1_CM -lz
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../src/include
 LOCAL_STATIC_LIBRARIES := android_native_app_glue png
